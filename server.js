@@ -137,13 +137,11 @@ const csrfProtection = csurf({
 
 
 
-
 const pool = new Pool({
-  host: "localhost",
-  user: process.env.DB_USER,
-password: process.env.DB_PASSWORD,
-database: process.env.DB_NAME,
-  port: 5432,
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false
+  }
 });
 // ✅ SESSION QUESTIONS CONFIG
 const sessionQuestions = [
