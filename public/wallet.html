@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wallet</title>
+<link rel="stylesheet" href="style.css">
+<style>
+/* RESET */
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+
+}
+
+/* BACKGROUND */
+body{
+background:linear-gradient(135deg,#08081c,#020220);
+min-height:100vh;
+color:#222;
+}
+
+/* NAVBAR */
+header{
+background:rgba(15,15,25,0.85);
+backdrop-filter:blur(12px);
+color:white;
+padding:18px;
+display:flex;
+align-items:center;
+justify-content:center;
+position:sticky;
+top:0;
+font-size:22px;
+font-weight:600;
+border-bottom:1px solid rgba(0,255,200,0.2);
+box-shadow:0 5px 25px rgba(0,0,0,0.2);
+z-index:10000;
+}
+
+/* MENU */
+.menu-btn{
+position:absolute;
+left:15px;
+font-size:22px;
+cursor:pointer;
+transition:0.3s;
+
+/* 🔥 IMPORTANT */
+z-index:10001;
+}
+
+.menu-btn:hover{
+color:#00ffc3;
+transform:scale(1.2);
+}
+
+/* SIDEBAR */
+.sidebar{
+position:fixed;
+top:0;
+left:-240px;
+width:240px;
+height:100%;
+
+background:rgba(10,10,20,0.95);
+backdrop-filter:blur(15px);
+padding-top:70px;
+transition:0.4s ease;
+
+/* 🔥 IMPORTANT FIX */
+z-index:9999;
+
+box-shadow:5px 0 30px rgba(0,0,0,0.4);
+}
+
+.sidebar a{
+display:block;
+padding:15px 20px;
+color:#ccc;
+text-decoration:none;
+transition:0.3s;
+}
+
+.sidebar a:hover{
+color:#00ffc3;
+background:rgba(0,255,200,0.08);
+padding-left:25px;
+}
+
+/* CONTAINER */
+.container{
+width:95%;
+max-width:1100px;
+margin:40px auto;
+padding:20px;
+text-align:center;
+}
+
+/* CARD */
+.card{
+background:white;
+padding:25px;
+border-radius:16px;
+box-shadow:0 10px 30px rgba(0,0,0,0.08);
+position:relative;
+overflow:hidden;
+transition:0.3s;
+width: 100%;
+}
+footer{
+margin-top:30px;
+}
+/* neon border glow */
+.card::before{
+content:'';
+position:absolute;
+inset:0;
+border-radius:16px;
+padding:1px;
+background:linear-gradient(120deg,#00ffc3,transparent,#00ffc3);
+-webkit-mask:
+linear-gradient(#fff 0 0) content-box,
+linear-gradient(#fff 0 0);
+-webkit-mask-composite:xor;
+mask-composite:exclude;
+opacity:0;
+transition:0.4s;
+pointer-events: none;
+}
+
+.card:hover::before{
+opacity:1;
+}
+
+.card:hover{
+transform:translateY(-5px);
+}
+
+/* BALANCE */
+.balance{
+font-size:34px;
+font-weight:700;
+color:#0f172a;
+margin-bottom:20px;
+text-shadow:0 0 10px rgba(0,255,200,0.3);
+}
+
+/* BUTTON GROUP */
+.btn-group{
+display:flex;
+gap:15px;
+justify-content:center;
+}
+.form-box {
+  position: relative;
+  z-index: 10;
+}
+/* BUTTON */
+button{
+padding:12px 20px;
+background:#0f172a;
+color:#00ffc3;
+border:none;
+border-radius:8px;
+cursor:pointer;
+font-weight:600;
+transition:all 0.3s ease;
+box-shadow:0 0 10px rgba(0,255,200,0.2);
+position:relative;
+overflow:hidden;
+}
+
+button:hover{
+background:#020617;
+transform:translateY(-2px);
+box-shadow:0 0 18px rgba(0,255,200,0.6);
+}
+
+button::after{
+content:'';
+position:absolute;
+top:0;
+left:-100%;
+width:100%;
+height:100%;
+background:linear-gradient(120deg,transparent,rgba(0,255,200,0.4),transparent);
+transition:0.5s;
+}
+
+button:hover::after{
+left:100%;
+}
+
+/* FORM */
+.form-box{
+margin-top:20px;
+display:none;
+animation:fadeUp 0.4s ease;
+}
+
+@keyframes fadeUp{
+from{opacity:0; transform:translateY(10px);}
+to{opacity:1; transform:translateY(0);}
+}
+
+/* INPUT */
+input{
+padding:12px;
+width:90%;
+margin:8px 0;
+border-radius:8px;
+border:none;
+background:#f1f5f9;
+transition:0.3s;
+}
+
+input:focus{
+outline:none;
+box-shadow:0 0 0 2px #00ffc333;
+transform:scale(1.05);
+}
+
+/* QR */
+.qr{
+width:180px;
+margin:15px auto;
+border-radius:10px;
+box-shadow:0 0 15px rgba(0,255,200,0.2);
+}
+
+/* POPUP */
+.popup-bg{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.5);
+display:none;
+justify-content:center;
+align-items:center;
+
+/* ✅ ADD THIS */
+z-index:9999;
+}
+
+.popup{
+background:#0f172a;
+color:white;
+padding:25px;
+border-radius:14px;
+width:300px;
+text-align:center;
+box-shadow:0 0 25px rgba(0,255,200,0.4);
+animation:fadeUp 0.3s ease;
+z-index:10000;
+}
+
+/* HISTORY CARD */
+#walletHistoryList{
+margin-top:15px;
+}
+
+/* MOBILE */
+@media(max-width:500px){
+.container{
+margin:20px auto;
+padding:15px;
+}
+}
+input, button {
+  position: relative;
+  z-index: 5;
+
+}
+#liveWithdraw{
+  height: 4vh;
+  position: relative;
+  z-index: -1;
+}
+html, body {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.container {
+  flex: 1;
+}
+</style>
+</head>
+
+<body>
+
+<div class="sidebar" id="sidebar">
+<a href="home.html">Home</a>
+<a href="profile.html">Profile</a>
+<a href="history.html">History</a>
+<a href="session.html">Sessions</a>
+</div>
+
+<header>
+<div class="menu-btn" onclick="toggleMenu()">☰</div>
+Queen Book
+</header>
+<div id="liveWithdraw" style="
+background:#000;
+color:#fff;
+overflow:hidden;
+white-space:nowrap;
+padding:8px 0;
+font-size:13px;
+position:relative;
+">
+  <div id="tickerText" style="position:absolute; left:100%;">
+    Loading...
+  </div>
+</div>
+<div class="container">
+
+<div class="card">
+
+<h2 style="margin-bottom:15px; font-size:20px; color:#0f172a;">
+Wallet
+</h2>
+
+<div class="balance">Pts.<span id="balance">0</span></div>
+
+<div class="btn-group">
+<button onclick="openForm('add')">Add Points</button>
+<button onclick="openForm('withdraw')">Withdraw</button>
+</div>
+
+<div class="form-box" id="formBox">
+
+<img id="qr" src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=upi://pay" class="qr">
+<div id="upiText" style="font-weight:bold; margin-top:8px;">
+UPI ID: jhon@ybl
+</div>
+<input type="text" id="name" placeholder="Your Name">
+<input type="email" id="email" placeholder="Email (Registered on id)">
+<input type="number" id="amount" placeholder="Amount" min="100" oninput="this.value = this.value.replace(/[^0-9]/g,'')">
+<input type="text" id="extra" placeholder="Transaction ID (Mandatory)">
+
+<p id="infoText" style="font-size:13px;color:#666;">
+Please verify the Transaction ID in your UPI app and enter it correctly. 
+An incorrect Transaction ID may cause the add-points process to fail, 
+and no refund will be issued in such cases.
+</p>
+
+<button onclick="submitForm()">Submit</button>
+
+</div>
+
+</div>
+<div class="card" style="margin-top:20px;">
+<h3>Wallet History</h3>
+<div id="walletHistoryList"></div>
+</div>
+</div>
+
+<div class="popup-bg" id="popupBg">
+<div class="popup">
+<h3 id="popupText"></h3>
+<button onclick="closePopup()">OK</button>
+</div>
+</div>
+
+<script>
+let CSRF_TOKEN = null;
+
+// fetch token once
+async function loadCSRF(){
+  try{
+    const res = await fetch("/csrf-token", {
+      credentials: "include"
+    });
+    const data = await res.json();
+    CSRF_TOKEN = data.csrfToken;
+  }catch(e){
+    console.error("CSRF load error");
+  }
+}
+
+// wrapper for ALL POST requests
+async function secureFetch(url, options = {}){
+  if(!CSRF_TOKEN){
+    await loadCSRF();
+  }
+
+  options.headers = {
+    ...(options.headers || {}),
+    "Content-Type": "application/json",
+    "CSRF-Token": CSRF_TOKEN
+  };
+
+  options.credentials = "include";
+
+  return fetch(url, options);
+}
+
+// load token on page start
+loadCSRF();
+let actionType=null;
+let loggedInEmail = "";
+/* MENU */
+function toggleMenu(){
+let sidebar=document.getElementById("sidebar");
+sidebar.style.left=(sidebar.style.left==="0px")?"-220px":"0px";
+}
+
+/* LOAD BALANCE */
+function loadBalance(){
+fetch("/balance")
+.then(res=>res.json())
+.then(data=>{
+document.getElementById("balance").innerText=data.balance||0;
+});
+}
+loadBalance();
+fetch("/user")
+.then(res=>res.json())
+.then(data=>{
+  loggedInEmail = data.email;
+});
+/* OPEN FORM */
+function openForm(type){
+
+actionType=type;
+document.getElementById("formBox").style.display="block";
+
+let qr=document.getElementById("qr");
+let infoText = document.getElementById("infoText");
+let upiText = document.getElementById("upiText");
+
+if(type==="add"){
+
+  qr.style.display="block";
+  upiText.style.display="block";   // ✅ SHOW UPI
+
+  document.getElementById("extra").placeholder="Transaction ID";
+
+  infoText.innerHTML = `
+  Please verify the Transaction ID in your UPI app and enter it correctly. 
+  An incorrect Transaction ID may cause the add-points process to fail, 
+  and no refund will be issued in such cases.
+  `;
+
+}else{
+
+  qr.style.display="none";
+  upiText.style.display="none";   // ❌ HIDE UPI
+
+  document.getElementById("extra").placeholder="UPI ID";
+
+  infoText.innerHTML = `
+  💸 Charges:<br>
+  - Below Pts.500 → Pts.20<br>
+  - Pts.500–Pts.1000 → Pts.30<br>
+  - Above Pts.1000 → No charge<br><br>
+  📊 Max 12 withdrawals per month
+  `;
+
+}
+}
+
+/* SUBMIT */
+function submitForm(){
+
+let n=document.getElementById("name").value.trim();
+let e=document.getElementById("email").value.trim();
+if(e !== loggedInEmail){
+  showPopup("Please enter the email on your account (check profile --> email)");
+  return;
+}
+let ex=document.getElementById("extra").value.trim();
+let amt=parseInt(document.getElementById("amount").value);
+
+if(n===""||e===""||ex===""||isNaN(amt)){
+showPopup("All fields required");
+return;
+}
+
+if(actionType==="add"){
+
+if(amt < 100){
+  showPopup("Minimum add Points amount is 100");
+  return;
+}
+
+secureFetch("/requestPayment",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({name:n,email:e,amount:amt,transaction_id:ex})
+})
+.then(res=>res.json())
+.then(data=>showPopup(data.message));
+
+}
+
+if(actionType==="withdraw"){
+
+// ✅ EMAIL CHECK
+if(e !== loggedInEmail){
+  showPopup("Please enter the email on your account (check profile --> email)");
+  return;
+}
+
+if(amt < 200){
+  showPopup("Minimum withdraw is 200");
+  return;
+}
+
+secureFetch("/requestWithdraw",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({name:n,email:e,amount:amt,upi_id:ex})
+})
+.then(res=>res.json())
+.then(data=>showPopup(data.message));
+
+}
+
+document.getElementById("formBox").style.display="none";
+document.getElementById("name").value="";
+document.getElementById("email").value="";
+document.getElementById("amount").value="";
+document.getElementById("extra").value="";
+
+}
+
+/* POPUP */
+function showPopup(msg){
+document.getElementById("popupText").innerText=msg;
+document.getElementById("popupBg").style.display="flex";
+}
+
+function closePopup(){
+document.getElementById("popupBg").style.display="none";
+}
+function formatDate(dateStr){
+
+let d = new Date(dateStr);
+
+return d.toLocaleString("en-IN", {
+  timeZone: "Asia/Kolkata",
+  day: "numeric",
+  month: "long",
+  year: "numeric",
+  hour: "2-digit",
+  minute: "2-digit"
+});
+
+}
+
+function loadWalletHistory(){
+
+fetch("/walletHistory")
+.then(res=>{
+  if(!res.ok){
+    window.location.href = "login.html";
+    return null;
+  }
+  return res.json();
+})
+.then(data=>{
+  if(!data) return;
+
+let box = document.getElementById("walletHistoryList");
+box.innerHTML="";
+
+if(data.length === 0){
+  box.innerHTML = "<p style='text-align:center;color:#666'>No transactions yet</p>";
+  return;
+}
+
+data.forEach(t=>{
+
+
+let bg = "#f1f1f1";
+
+let statusText = "🟡 Pending";
+let color = "#999";
+
+if(t.status === "approved"){
+  statusText = "🟢 Success";
+  color = "green";
+}
+let typeText = t.type === "add" ? "Add Poinst" : "Withdraw";
+let icon = t.type === "add" ? "➕" : "💸";
+
+let div = document.createElement("div");
+
+div.style = `
+background:white;
+padding:15px;
+border-radius:10px;
+margin-bottom:12px;
+box-shadow:0 4px 10px rgba(0,0,0,0.08);
+display:flex;
+justify-content:space-between;
+align-items:center;
+`;
+
+// left section
+let left = document.createElement("div");
+left.style.display = "flex";
+left.style.gap = "12px";
+left.style.alignItems = "center";
+
+// icon
+let iconBox = document.createElement("div");
+iconBox.style.background = bg;
+iconBox.style.padding = "10px";
+iconBox.style.borderRadius = "50%";
+iconBox.style.fontSize = "18px";
+iconBox.textContent = icon;
+
+// text area
+let textWrap = document.createElement("div");
+
+// title
+let title = document.createElement("div");
+title.style.fontWeight = "bold";
+title.textContent = typeText;
+
+// date
+let date = document.createElement("div");
+date.style.fontSize = "13px";
+date.style.color = "#666";
+date.textContent = "📅 " + formatDate(t.date);
+
+// status
+let status = document.createElement("div");
+status.style.color = color;
+status.style.fontSize = "14px";
+status.textContent = statusText;
+
+textWrap.appendChild(title);
+textWrap.appendChild(date);
+textWrap.appendChild(status);
+
+left.appendChild(iconBox);
+left.appendChild(textWrap);
+
+// right section
+let right = document.createElement("div");
+right.style.fontWeight = "bold";
+right.style.fontSize = "16px";
+
+let amt = document.createElement("div");
+amt.textContent = "Pts." + t.amount;
+
+right.appendChild(amt);
+
+// withdraw extra info
+if(t.type === "withdraw"){
+  let extra = document.createElement("div");
+  extra.style.fontSize = "12px";
+  extra.style.color = "#888";
+  extra.textContent = `Charge: Pts.${t.charge} | Final: Pts.${t.final}`;
+  right.appendChild(extra);
+}
+
+// append to card
+div.appendChild(left);
+div.appendChild(right);
+
+box.appendChild(div);
+
+});
+
+});
+}
+
+loadWalletHistory();
+setInterval(loadWalletHistory, 8000);
+</script>
+<footer style="background:#000000; color:#ffffff; padding:15px; text-align:center; font-size:12px; border-top:1px solid #ddd; margin-top:auto;">
+All transactions conducted on this website are carried out exclusively using virtual currency. No real-world currency is utilized, involved, or affected in any manner. The platform does not intend to represent, misuse, or disrespect any form of legal tender whatsoever.
+</footer>
+</body>
+</html>

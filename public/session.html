@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sessions</title>
+<link rel="stylesheet" href="style.css">
+<style>
+
+/* RESET */
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+
+}
+
+/* BACKGROUND */
+body{
+background:linear-gradient(135deg,#08081c,#020220);
+min-height:100vh;
+color:#222;
+}
+
+/* HEADER */
+header{
+background:rgba(20,20,30,0.8);
+backdrop-filter:blur(12px);
+color:white;
+padding:18px;
+display:flex;
+align-items:center;
+justify-content:center;
+position:sticky;
+top:0;
+font-size:22px;
+font-weight:600;
+box-shadow:0 5px 25px rgba(0,0,0,0.2);
+border-bottom:1px solid rgba(0,255,200,0.2);
+z-index:1000;
+}
+
+/* MENU */
+.menu-btn{
+position:absolute;
+left:15px;
+font-size:22px;
+cursor:pointer;
+transition:0.3s;
+z-index: 1100;
+
+}
+
+.menu-btn:hover{
+color:#00ffc3;
+transform:scale(1.2);
+}
+
+/* SIDEBAR */
+.sidebar{
+position:fixed;
+top:0;
+left:-240px;
+width:240px;
+height:100%;
+background:rgba(15,15,25,0.95);
+backdrop-filter:blur(15px);
+padding-top:70px;
+transition:0.4s ease;
+box-shadow:5px 0 30px rgba(0,0,0,0.4);
+z-index:999;
+}
+
+.sidebar a{
+display:block;
+padding:15px 20px;
+color:#ccc;
+text-decoration:none;
+transition:0.3s;
+}
+
+.sidebar a:hover{
+color:#00ffc3;
+background:rgba(0,255,200,0.08);
+padding-left:25px;
+}
+
+/* CONTAINER */
+body > h2{
+display:none;
+}
+
+.container{
+max-width:950px;
+margin:auto;
+padding:20px;
+}
+
+/* CARD */
+.card{
+background:white;
+padding:20px;
+border-radius:16px;
+margin-bottom:20px;
+box-shadow:0 10px 30px rgba(0,0,0,0.08);
+position:relative;
+overflow:hidden;
+transition:0.3s;
+}
+
+/* neon border */
+.card::before{
+  content:'';
+  position:absolute;
+  inset:0;
+  border-radius:16px;
+  padding:1px;
+  background:linear-gradient(120deg,#00ffc3,transparent,#00ffc3);
+  -webkit-mask:
+  linear-gradient(#fff 0 0) content-box,
+  linear-gradient(#fff 0 0);
+  -webkit-mask-composite:xor;
+  mask-composite:exclude;
+  opacity:0;
+  transition:0.4s;
+
+  pointer-events:none;   /* ✅ ADD THIS LINE */
+}
+button{
+  position:relative;
+  z-index:2;
+}
+.card:hover::before{
+opacity:1;
+}
+
+.card:hover{
+transform:translateY(-5px);
+box-shadow:0 20px 50px rgba(0,0,0,0.12);
+}
+
+/* LIVE MATCH */
+#liveMatch{
+background:linear-gradient(135deg,#0f172a,#020617);
+color:white;
+text-align:center;
+animation:pulse 2.5s infinite;
+}
+
+@keyframes pulse{
+0%{box-shadow:0 0 10px rgba(0,255,200,0.2);}
+50%{box-shadow:0 0 25px rgba(0,255,200,0.6);}
+100%{box-shadow:0 0 10px rgba(0,255,200,0.2);}
+}
+
+/* SESSION CARDS */
+.session-card{
+background:linear-gradient(135deg,#ecfeff,#f0fdf4);
+}
+
+/* QUESTION ROW */
+.q-row{
+display:flex;
+flex-direction:column;
+padding:12px;
+border-bottom:1px solid #eee;
+transition:0.3s;
+border-radius:10px;
+}
+
+.q-row:hover{
+background:#f9fafb;
+transform:scale(1.01);
+}
+
+/* LEFT */
+.q-left{
+display:flex;
+align-items:center;
+gap:10px;
+margin-bottom:8px;
+}
+
+.q-left img{
+width:38px;
+height:38px;
+object-fit:contain;
+background:white;
+padding:4px;
+border-radius:8px;
+box-shadow:0 4px 10px rgba(0,0,0,0.08);
+}
+
+/* BUTTONS */
+button{
+padding:8px 14px;
+border:none;
+border-radius:8px;
+cursor:pointer;
+font-weight:600;
+transition:0.3s;
+box-shadow:0 0 10px rgba(0,255,200,0.2);
+}
+
+.yes{
+background:#00b894;
+color:white;
+}
+
+.no{
+background:#ff4d4f;
+color:white;
+}
+
+button:hover{
+transform:translateY(-2px);
+box-shadow:0 0 18px rgba(0,255,200,0.6);
+}
+
+/* BET BOX */
+.betbox{
+display:none;
+margin-top:10px;
+text-align:center;
+animation:fadeUp 0.4s ease;
+}
+
+@keyframes fadeUp{
+from{opacity:0; transform:translateY(10px);}
+to{opacity:1; transform:translateY(0);}
+}
+
+/* INPUT */
+input{
+padding:10px;
+border-radius:8px;
+border:none;
+background:#f1f5f9;
+transition:0.3s;
+margin-right:10px;
+}
+
+input:focus{
+outline:none;
+box-shadow:0 0 0 2px #00ffc333;
+transform:scale(1.05);
+}
+
+/* ONGOING */
+#ongoingBox div{
+padding:10px;
+margin-bottom:10px;
+background:#f8fafc;
+border-radius:10px;
+transition:0.3s;
+}
+
+#ongoingBox div:hover{
+transform:translateX(5px);
+box-shadow:0 5px 15px rgba(0,0,0,0.08);
+}
+#walletBox{
+position:absolute;
+right:20px;
+background:#00ffc3;
+color:#020617;
+padding:6px 12px;
+border-radius:8px;
+font-weight:600;
+box-shadow:0 0 10px rgba(0,255,200,0.4);
+}
+/* ONGOING LOGO FIX */
+#ongoingBox img{
+  width:40px;
+  height:40px;
+  object-fit:contain;
+  background:white;
+  padding:5px;
+  border-radius:8px;
+  box-shadow:0 3px 8px rgba(0,0,0,0.1);
+  margin-right:10px;
+}
+
+/* align logo + text */
+#ongoingBox div{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+/* POPUP */
+.popup{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:rgba(0,0,0,0.6);
+  display:none;
+  justify-content:center;
+  align-items:center;
+  z-index:99999;
+}
+
+.popup-box{
+  background:white;
+  padding:25px;
+  border-radius:14px;
+  text-align:center;
+  width:280px;
+  animation:fadeUp 0.3s ease;
+}
+
+.popup-box p{
+  margin-bottom:15px;
+  font-weight:500;
+}
+
+.popup-box button{
+  background:#00b894;
+  color:white;
+  padding:8px 16px;
+}
+/* 🎯 OPTION BUTTONS (SESSION) */
+.option-btn{
+  padding:10px 16px;
+  margin:6px 6px 0 0;
+  border:none;
+  border-radius:10px;
+  background:linear-gradient(135deg,#0f172a,#020617);
+  color:#00ffc3;
+  font-weight:600;
+  cursor:pointer;
+  transition:0.3s;
+  box-shadow:0 0 10px rgba(0,255,200,0.2);
+  border:1px solid rgba(0,255,200,0.2);
+}
+
+.option-btn:hover{
+  transform:translateY(-2px) scale(1.03);
+  box-shadow:0 0 18px rgba(0,255,200,0.6);
+}
+
+/* ✅ selected state */
+.option-btn.active{
+  background:#00ffc3;
+  color:#020617;
+  box-shadow:0 0 20px rgba(0,255,200,0.8);
+}
+
+/* layout fix */
+.q-row > div:nth-child(2){
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+}
+.how-btn{
+  position:absolute;
+  top:12px;
+  right:12px;
+  background:#020617;
+  color:#00ffc3;
+  border:none;
+  padding:5px 10px;
+  border-radius:6px;
+  font-size:12px;
+  cursor:pointer;
+}
+
+.how-btn:hover{
+  background:#000;
+}
+.tiku{
+  color: #ccc;
+  margin-top: 3vh;
+  margin-bottom: 3vh;
+}
+</style>
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar" id="sidebar">
+<a href="home.html">Home</a>
+<a href="wallet.html">Wallet</a>
+<a href="profile.html">Profile</a>
+<a href="history.html">History</a>
+</div>
+
+<!-- HEADER -->
+<header>
+<div class="menu-btn" onclick="toggleMenu()">☰</div>
+Queen Book
+<div id="walletBox">Pts.0</div>
+</header>
+<div class="container">
+    <h2 class="tiku">Sessions</h2>
+
+<!-- 🔴 LIVE MATCH -->
+<div class="card" id="liveMatch">
+<h3>🔴 LIVE MATCH</h3>
+<div id="liveMatchContent">Loading...</div>
+</div>
+
+<!-- 🏆 TOURNAMENT -->
+<div class="card session-card">
+  <button class="how-btn" onclick="showHowToPlay('tournament')">How to play ?</button>
+
+<h3>🏆 Tournament Sessions <br>(100x Returns)</h3>
+<div id="tournamentBox"></div>
+</div>
+
+<!-- ⚡ LIVE MATCH SESSIONS -->
+<div class="card session-card">
+  <button class="how-btn" onclick="showHowToPlay('matchsession')">How to play ?</button>
+
+<h3>⚡ Live Match Sessions</h3>
+<div id="liveBox"></div>
+</div>
+
+<!-- 📊 ONGOING -->
+<div class="card">
+<h3>Ongoing Sessions</h3>
+<div id="ongoingBox"></div>
+</div>
+
+</div>
+<script>
+  let CSRF_TOKEN = null;
+
+// fetch token once
+async function loadCSRF(){
+  try{
+    const res = await fetch("/csrf-token", {
+      credentials: "include"
+    });
+    const data = await res.json();
+    CSRF_TOKEN = data.csrfToken;
+  }catch(e){
+    console.error("CSRF load error");
+  }
+}
+
+// wrapper for ALL POST requests
+async function secureFetch(url, options = {}){
+  if(!CSRF_TOKEN){
+    await loadCSRF();
+  }
+
+  options.headers = {
+    ...(options.headers || {}),
+    "Content-Type": "application/json",
+    "CSRF-Token": CSRF_TOKEN
+  };
+
+  options.credentials = "include";
+
+  return fetch(url, options);
+}
+
+// load token on page start
+loadCSRF();
+    let tournamentBox = document.getElementById("tournamentBox");
+let liveBox = document.getElementById("liveBox");
+let ongoingBox = document.getElementById("ongoingBox");
+fetch("/matches")
+.then(res=>res.json())
+.then(data=>{
+
+let m = data.find(x=>x.status==="featured");
+
+if(!m) return;
+
+let box = document.getElementById("liveMatchContent");
+box.innerHTML = "";
+
+let row = document.createElement("div");
+row.style.display = "flex";
+row.style.alignItems = "center";
+row.style.justifyContent = "center";
+row.style.gap = "20px";
+row.style.marginTop = "10px";
+
+// team 1
+let t1 = document.createElement("div");
+t1.style.textAlign = "center";
+t1.style.display = "flex";
+t1.style.flexDirection = "column";
+t1.style.alignItems = "center";
+let img1 = document.createElement("img");
+img1.src = m.team1_logo;
+img1.style.width = "70px";
+img1.style.height = "70px";
+img1.style.objectFit = "contain";
+img1.style.background = "white";
+img1.style.padding = "6px";
+img1.style.borderRadius = "10px";
+
+let name1 = document.createElement("div");
+name1.textContent = m.team1_name;
+
+t1.appendChild(img1);
+t1.appendChild(name1);
+
+// VS
+let vs = document.createElement("div");
+vs.textContent = "VS";
+vs.style.fontWeight = "600";
+vs.style.color = "#aaa";
+
+// team 2
+let t2 = document.createElement("div");
+t2.style.textAlign = "center";
+t2.style.display = "flex";
+t2.style.flexDirection = "column";
+t2.style.alignItems = "center";
+let img2 = document.createElement("img");
+img2.src = m.team2_logo;
+img2.style.width = "70px";
+img2.style.height = "70px";
+img2.style.objectFit = "contain";
+img2.style.background = "white";
+img2.style.padding = "6px";
+img2.style.borderRadius = "10px";
+
+let name2 = document.createElement("div");
+name2.textContent = m.team2_name;
+
+t2.appendChild(img2);
+t2.appendChild(name2);
+
+// assemble
+row.appendChild(t1);
+row.appendChild(vs);
+row.appendChild(t2);
+
+box.appendChild(row);
+
+});
+function loadQuestions(){
+
+fetch("/sessionQuestions")
+.then(res=>{
+  if(!res.ok){
+    window.location.href = "login.html";
+    return null;
+  }
+  return res.json();
+})
+.then(data=>{
+  if(!data) return;
+
+tournamentBox.innerHTML="";
+liveBox.innerHTML="";
+
+data.forEach(q=>{
+
+let row = document.createElement("div");
+row.className="q-row";
+
+
+
+// left section
+let left = document.createElement("div");
+left.className = "q-left";
+
+let img = document.createElement("img");
+img.src = "/images/session.png";
+
+let text = document.createElement("span");
+text.textContent = q.question;
+
+left.appendChild(img);
+left.appendChild(text);
+
+// options container
+let optionsDiv = document.createElement("div");
+
+q.options.forEach(opt=>{
+  let btn = document.createElement("button");
+  btn.className = "option-btn";
+  btn.textContent = opt;
+  btn.onclick = () => openBet(q.id, btn, opt);
+  optionsDiv.appendChild(btn);
+});
+
+// bet box
+let betbox = document.createElement("div");
+betbox.className = "betbox";
+betbox.id = "bet_" + q.id;
+
+let input = document.createElement("input");
+input.type = "number";
+input.id = "amt_" + q.id;
+input.placeholder = "Min 20";
+
+let confirmBtn = document.createElement("button");
+confirmBtn.textContent = "Confirm";
+confirmBtn.onclick = () => confirmSession(q.id);
+
+betbox.appendChild(input);
+betbox.appendChild(confirmBtn);
+
+// assemble
+row.appendChild(left);
+row.appendChild(optionsDiv);
+row.appendChild(betbox);
+
+if(q.type==="tournament"){
+tournamentBox.appendChild(row);
+}else{
+liveBox.appendChild(row);
+}
+
+});
+
+});
+}
+
+window.onload = () => {
+  loadQuestions();
+  loadOngoing();
+  loadWallet();
+};
+let selectedChoice = {};
+
+function openBet(id,btn,choice){
+
+selectedChoice[id] = choice;
+
+// ❌ remove active from all buttons of this question
+let parent = btn.parentElement;
+parent.querySelectorAll(".option-btn").forEach(b=>{
+  b.classList.remove("active");
+});
+
+// ✅ add active to clicked
+btn.classList.add("active");
+
+// hide all bet boxes
+document.querySelectorAll(".betbox").forEach(b=>{
+  b.style.display="none";
+});
+
+// show selected one
+let box = document.getElementById("bet_"+id);
+
+if(box){
+  box.style.display="block";
+}
+
+}
+function confirmSession(id){
+
+let amt = parseInt(document.getElementById("amt_"+id).value);
+
+if(isNaN(amt) || amt < 20){
+showPopup("Minimum bet is Pts.20");
+return;
+}
+
+secureFetch("/placeSessionBet",{
+method:"POST",
+body:JSON.stringify({
+question_id:id,
+choice:selectedChoice[id] || "",
+amount:amt
+})
+})
+.then(res=>res.json())
+.then(data=>{
+if(data.success){
+
+  showPopup("Bet placed successfully ✅");
+
+  // ✅ update ongoing bets instantly
+  loadOngoing();
+
+  // ✅ update wallet balance instantly
+  loadWallet();
+
+  // ✅ hide bet box after placing bet
+  let box = document.getElementById("bet_"+id);
+  if(box){
+    box.style.display = "none";
+  }
+
+}else{
+  showPopup(data.msg || "Something went wrong");
+}
+});
+
+}
+function loadOngoing(){
+
+fetch("/sessionBets")
+.then(res=>res.json())
+.then(data=>{
+
+ongoingBox.innerHTML="";
+
+data.forEach(b=>{
+
+let div = document.createElement("div");
+
+let img = document.createElement("img");
+img.src = "/images/session.png";
+
+let text = document.createElement("div");
+text.innerHTML = `
+${b.question_text}<br>
+${b.session_choice.toUpperCase()} - Pts.${b.amount} (Pending)
+`;
+
+div.appendChild(img);
+div.appendChild(text);
+
+ongoingBox.appendChild(div);
+
+});
+
+});
+}
+function toggleMenu(){
+let menu=document.getElementById("sidebar");
+menu.style.left = (menu.style.left==="0px") ? "-220px" : "0px";
+}
+loadOngoing();
+function loadWallet(){
+
+fetch("/balance")
+.then(res=>res.json())
+.then(data=>{
+document.getElementById("walletBox").innerText = "Pts."+data.balance;
+});
+
+}
+function showPopup(message){
+  document.getElementById("popupMsg").innerText = message;
+  document.getElementById("popup").style.display = "flex";
+}
+
+function closePopup(){
+  document.getElementById("popup").style.display = "none";
+}
+function showHowToPlay(type){
+
+let text = "";
+
+if(type === "tournament"){
+  text = `Each question offers 10 different options. Users can place their points on any one option, and if their selection is correct, they will receive 100× returns (for example, 100 points will return 10,000 points).
+
+Important:
+a) Each user can place points on a question only once.
+b) This game will close at any time during the group stage.`;
+}
+
+else if(type === "matchsession"){
+  text = `This session runs during the live match. Each question has 4 options, and users can place their points on any one of them. If the selected option is correct, the user will receive 1.7× returns (for example, 100 points will return 170 points).
+
+Important:
+Questions will close according to the match schedule, so please place your points accordingly.`;
+}
+
+// show popup
+showPopup(text);
+
+}
+</script>
+
+    <div id="popup" class="popup">
+  <div class="popup-box">
+    <p id="popupMsg"></p>
+    <button onclick="closePopup()">OK</button>
+  </div>
+</div>
+<footer style="background:#000000; color:#ffffff; padding:15px; text-align:center; font-size:12px; border-top:1px solid #ddd;">
+All transactions conducted on this website are carried out exclusively using virtual currency. No real-world currency is utilized, involved, or affected in any manner. The platform does not intend to represent, misuse, or disrespect any form of legal tender whatsoever.
+</footer>
+</body>
+</html>

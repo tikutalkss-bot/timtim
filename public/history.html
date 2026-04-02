@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>History</title>
+<link rel="stylesheet" href="style.css">
+<style>
+/* RESET */
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+
+}
+
+/* BACKGROUND */
+body{
+ background:linear-gradient(135deg,#08081c,#020220);
+  min-height:100vh;
+  color:#222;
+
+  display:flex;              /* 👈 ADD */
+  flex-direction:column;     /* 👈 ADD */
+}
+
+/* HEADER */
+header{
+background:rgba(15,15,25,0.85);
+backdrop-filter:blur(12px);
+color:white;
+padding:18px;
+display:flex;
+align-items:center;
+justify-content:center;
+
+position:sticky;
+top:0;
+
+/* 🔥 IMPORTANT FIX */
+z-index:1000;
+
+font-size:22px;
+font-weight:600;
+border-bottom:1px solid rgba(0,255,200,0.2);
+box-shadow:0 5px 25px rgba(0,0,0,0.2);
+}
+/* MENU */footer{
+margin-top:30px;
+}
+.menu-btn{
+position:absolute;
+left:15px;
+font-size:22px;
+cursor:pointer;
+transition:0.3s;
+}
+
+.menu-btn:hover{
+color:#00ffc3;
+transform:scale(1.2);
+}
+
+/* SIDEBAR */
+.sidebar{
+position:fixed;
+top:0;
+left:-240px;
+width:240px;
+height:100%;
+background:rgba(10,10,20,0.95);
+backdrop-filter:blur(15px);
+padding-top:70px;
+transition:0.4s ease;
+box-shadow:5px 0 30px rgba(0,0,0,0.4);
+z-index: 2;
+}
+
+.sidebar a{
+display:block;
+padding:15px 20px;
+color:#ccc;
+text-decoration:none;
+transition:0.3s;
+}
+
+.sidebar a:hover{
+color:#00ffc3;
+background:rgba(0,255,200,0.08);
+padding-left:25px;
+}
+
+/* CONTAINER */
+.container{
+max-width:900px;
+margin:auto;
+padding:20px;
+position:relative;
+z-index:1;
+flex:1;
+width: 100%;
+}
+
+/* CARD */
+.card{
+background:white;
+padding:20px;
+border-radius:16px;
+box-shadow:0 10px 30px rgba(0,0,0,0.08);
+position:relative;
+overflow:hidden;
+transition:0.3s;
+}
+
+/* neon border */
+.card::before{
+content:'';
+position:absolute;
+inset:0;
+border-radius:16px;
+padding:1px;
+background:linear-gradient(120deg,#00ffc3,transparent,#00ffc3);
+-webkit-mask:
+linear-gradient(#fff 0 0) content-box,
+linear-gradient(#fff 0 0);
+-webkit-mask-composite:xor;
+mask-composite:exclude;
+opacity:0;
+transition:0.4s;
+}
+
+.card:hover::before{
+opacity:1;
+}
+
+.card:hover{
+transform:translateY(-5px);
+}
+
+/* TITLE */
+h3{
+margin-bottom:10px;
+}
+
+/* BET ITEM */
+.bet-item{
+display:flex;
+align-items:center;
+justify-content:space-between;
+padding:14px;
+border-bottom:1px solid #eee;
+transition:0.3s;
+border-radius:10px;
+}
+
+.bet-item:hover{
+background:#f9fafb;
+transform:scale(1.01);
+}
+
+/* LEFT */
+.bet-left{
+display:flex;
+align-items:center;
+gap:12px;
+}
+
+.bet-left img{
+width:42px;
+height:42px;
+border-radius:50%;
+box-shadow:0 0 10px rgba(0,255,200,0.2);
+}
+
+/* TEAM NAME */
+.team-name{
+font-weight:600;
+}
+
+/* STATUS */
+.status{
+font-size:14px;
+margin-top:3px;
+}
+
+/* WIN */
+.win{
+color:#00b894;
+font-weight:600;
+text-shadow:0 0 6px rgba(0,255,150,0.4);
+}
+
+/* LOSS */
+.loss{
+color:#ff4d4f;
+font-weight:600;
+text-shadow:0 0 6px rgba(255,0,0,0.3);
+}
+
+/* PENDING */
+.pending{
+color:#999;
+}
+
+/* AMOUNT */
+.bet-item > div:last-child{
+font-weight:600;
+font-size:16px;
+}
+
+/* MOBILE */
+@media(max-width:768px){
+.bet-item{
+flex-direction:column;
+align-items:flex-start;
+gap:10px;
+}
+}
+</style>
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar" id="sidebar">
+<a href="home.html">Home</a>
+<a href="wallet.html">Wallet</a>
+<a href="profile.html">Profile</a>
+<a href="session.html">Sessions</a>
+</div>
+
+<!-- HEADER -->
+<header>
+<div class="menu-btn" onclick="toggleMenu()">☰</div>
+Queen Book
+</header>
+
+<div class="container">
+
+<div class="card">
+<h3>History</h3>
+<div id="historyList"></div>
+</div>
+
+</div>
+
+<script>
+let CSRF_TOKEN = null;
+
+// fetch token once
+async function loadCSRF(){
+  try{
+    const res = await fetch("/csrf-token", {
+      credentials: "include"
+    });
+    const data = await res.json();
+    CSRF_TOKEN = data.csrfToken;
+  }catch(e){
+    console.error("CSRF load error");
+  }
+}
+
+// wrapper for ALL POST requests
+async function secureFetch(url, options = {}){
+  if(!CSRF_TOKEN){
+    await loadCSRF();
+  }
+
+  options.headers = {
+    ...(options.headers || {}),
+    "Content-Type": "application/json",
+    "CSRF-Token": CSRF_TOKEN
+  };
+
+  options.credentials = "include";
+
+  return fetch(url, options);
+}
+
+// load token on page start
+loadCSRF();
+/* MENU */
+function toggleMenu(){
+let menu=document.getElementById("sidebar");
+menu.style.left = (menu.style.left==="0px") ? "-220px" : "0px";
+}
+
+/* LOAD HISTORY */
+function loadHistory(){
+
+  fetch("/bets")
+  .then(res=>{
+    if(!res.ok){
+      window.location.href = "login.html";
+      return null;
+    }
+    return res.json();
+  })
+  .then(data=>{
+    if(!data) return;
+
+    historyList.innerHTML="";
+
+    data.forEach(b=>{
+
+      // =========================
+      // ✅ SESSION BETS (SECURE + ORIGINAL LOGIC)
+      // =========================
+      if(b.type === "session"){
+
+  if(b.status === "pending") return;
+
+  let div = document.createElement("div");
+  div.className = "bet-item";
+
+  let statusClass = b.status === "won" ? "win" : "loss";
+  let statusText = b.status === "won"
+    ? "🟢 Won +Pts." + b.payout
+    : "🔴 Lost";
+
+  let left = document.createElement("div");
+  left.className = "bet-left";
+
+  // ✅ ALWAYS SAME IMAGE (your requirement)
+  let img = document.createElement("img");
+  img.src = "/images/session.png";
+
+  let textWrap = document.createElement("div");
+
+  // ✅ 1. QUESTION (ALWAYS)
+  let question = document.createElement("div");
+  question.className = "team-name";
+  question.textContent = b.question_text || "Session Bet";
+
+  // ✅ 2. DATE (CORRECT FIX)
+  let date = document.createElement("div");
+  date.style.fontSize = "13px";
+  date.style.color = "#666";
+
+  if(b.created_at){
+    date.textContent = "📅 " + formatDate(b.created_at);
+  } else {
+    date.textContent = "📅 -";
+  }
+
+  // ✅ 3. TEAMS ONLY IF LIVE MATCH SESSION
+  let teams = document.createElement("div");
+  teams.style.fontSize = "13px";
+  teams.style.color = "#444";
+
+ // ✅ show teams ONLY for match sessions
+if(b.session_question_id >= 5){
+  teams.textContent = b.match_team1 + " vs " + b.match_team2;
+} else {
+  teams.textContent = "Tournament Session";
+}
+
+  // status
+  let status = document.createElement("div");
+  status.className = "status " + statusClass;
+  status.textContent = statusText;
+
+  textWrap.appendChild(question);
+  textWrap.appendChild(date);
+  textWrap.appendChild(teams);
+  textWrap.appendChild(status);
+
+  left.appendChild(img);
+  left.appendChild(textWrap);
+
+  let amt = document.createElement("div");
+  amt.textContent = "Pts." + b.amount;
+
+  div.appendChild(left);
+  div.appendChild(amt);
+
+  historyList.appendChild(div);
+
+  return;
+}
+
+      // =========================
+      // ✅ NORMAL / RAPID / TOSS (SECURE VERSION)
+      // =========================
+      let rapidTag = (b.type === "rapid") ? "⚡ RAPID " : "";
+      let tossTag = (b.type === "toss") ? "🪙 TOSS SESSION " : "";
+
+      if(b.status !== "pending"){
+
+        let statusClass = "pending";
+        let statusText = "Pending";
+
+        if(b.status === "won"){
+          statusClass = "win";
+          statusText = tossTag + rapidTag + "🟢 Won +Pts." + b.payout;
+        }
+        else if(b.status === "lost"){
+          statusClass = "loss";
+          statusText = tossTag + rapidTag + "🔴 Lost";
+        }
+
+        let div = document.createElement("div");
+        div.className = "bet-item";
+
+        let left = document.createElement("div");
+        left.className = "bet-left";
+
+        let img = document.createElement("img");
+        img.src = (b.team == 1 ? b.team1_logo : b.team2_logo);
+
+        let textWrap = document.createElement("div");
+
+        let team = document.createElement("div");
+        team.className = "team-name";
+        team.textContent =
+          (b.team == 1 ? b.team1_name : b.team2_name) +
+          (b.player_name ? " - " + b.player_name : "");
+
+        let date = document.createElement("div");
+        date.style.fontSize = "13px";
+        date.style.color = "#666";
+        date.textContent = "📅 " + formatDate(b.match_date);
+
+        let status = document.createElement("div");
+        status.className = "status " + statusClass;
+        status.textContent = statusText;
+
+        textWrap.appendChild(team);
+        textWrap.appendChild(date);
+        textWrap.appendChild(status);
+
+        left.appendChild(img);
+        left.appendChild(textWrap);
+
+        let amt = document.createElement("div");
+        amt.textContent = "Pts." + b.amount;
+
+        div.appendChild(left);
+        div.appendChild(amt);
+
+        historyList.appendChild(div);
+      }
+
+    });
+
+  });
+
+}
+function formatDate(dateStr){
+  let d = new Date(dateStr);
+
+  let day = d.getDate();
+  let suffix = ["th","st","nd","rd"][(day%10>3)?0:(day%100-day%10!=10)?day%10:0];
+
+  return day + suffix + " " +
+  d.toLocaleString('default',{month:'long'}) +
+  " " + d.getFullYear();
+}
+loadHistory();
+
+</script>
+<footer style="background:#000000; color:#ffffff; padding:15px; text-align:center; font-size:12px; border-top:1px solid #ddd;">
+All transactions conducted on this website are carried out exclusively using virtual currency. No real-world currency is utilized, involved, or affected in any manner. The platform does not intend to represent, misuse, or disrespect any form of legal tender whatsoever.
+</footer>
+</body>
+</html>

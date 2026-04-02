@@ -1,0 +1,1324 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Admin Panel</title>
+<meta http-equiv="Content-Security-Policy"
+content="
+default-src 'self';
+script-src 'self' 'unsafe-inline';
+style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+font-src https://fonts.gstatic.com;
+">
+<link rel="stylesheet" href="style.css">
+<style>
+/* RESET */
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+
+}
+
+/* BACKGROUND */
+body{
+background:linear-gradient(135deg,#eef2f7,#e6ecf5);
+padding:30px;
+color:#222;
+}
+
+/* TITLE */
+h2{
+margin-bottom:20px;
+color:#0f172a;
+}
+
+/* TAB BUTTONS */
+body > div:first-of-type{
+margin-bottom:20px;
+display:flex;
+gap:10px;
+flex-wrap:wrap;
+}
+
+body > div:first-of-type button{
+background:#0f172a;
+color:#00ffc3;
+border:none;
+padding:10px 18px;
+border-radius:8px;
+cursor:pointer;
+font-weight:600;
+transition:0.3s;
+box-shadow:0 0 10px rgba(0,255,200,0.2);
+}
+
+body > div:first-of-type button:hover{
+background:#020617;
+box-shadow:0 0 18px rgba(0,255,200,0.6);
+transform:translateY(-2px);
+}
+
+/* CARD */
+.card{
+background:white;
+padding:20px;
+border-radius:16px;
+margin-bottom:20px;
+box-shadow:0 10px 30px rgba(0,0,0,0.08);
+position:relative;
+overflow:hidden;
+transition:0.3s;
+z-index:1;
+}
+
+/* neon border */
+.card::before{
+content:'';
+position:absolute;
+inset:0;
+border-radius:16px;
+padding:1px;
+background:linear-gradient(120deg,#00ffc3,transparent,#00ffc3);
+-webkit-mask:
+linear-gradient(#fff 0 0) content-box,
+linear-gradient(#fff 0 0);
+-webkit-mask-composite:xor;
+mask-composite:exclude;
+opacity:0;
+transition:0.4s;
+pointer-events:none; /* ✅ CRITICAL FIX */
+z-index:0;
+}
+
+.card:hover::before{
+opacity:1;
+}
+
+.card:hover{
+transform:translateY(-5px);
+}
+
+/* INPUTS + SELECT */
+select,input{
+padding:10px;
+margin:6px;
+border-radius:8px;
+border:none;
+background:#f1f5f9;
+transition:0.3s;
+}
+
+select:focus,input:focus{
+outline:none;
+box-shadow:0 0 0 2px #00ffc333;
+transform:scale(1.03);
+}
+
+/* BUTTON */
+button{
+padding:9px 16px;
+background:#0f172a;
+color:#00ffc3;
+border:none;
+border-radius:8px;
+cursor:pointer;
+font-weight:600;
+transition:all 0.3s ease;
+box-shadow:0 0 10px rgba(0,255,200,0.2);
+position:relative;
+overflow:hidden;
+}
+
+button:hover{
+background:#020617;
+box-shadow:0 0 18px rgba(0,255,200,0.6);
+transform:translateY(-2px);
+}
+
+button:active{
+transform:scale(0.95);
+}
+
+/* neon sweep */
+button::after{
+content:'';
+position:absolute;
+top:0;
+left:-100%;
+width:100%;
+height:100%;
+background:linear-gradient(120deg,transparent,rgba(0,255,200,0.4),transparent);
+transition:0.5s;
+}
+
+button:hover::after{
+left:100%;
+}
+
+/* REQUEST ITEMS */
+.req{
+border-bottom:1px solid #eee;
+padding:12px 0;
+transition:0.3s;
+}
+
+.req:hover{
+background:#f9fafb;
+padding-left:5px;
+}
+
+/* MONITOR PANEL */
+#monitorList{
+margin-top:10px;
+}
+
+#monitorList h4{
+color:#0f172a;
+margin-top:15px;
+}
+
+/* USER BLOCK */
+#monitorList > div{
+background:white;
+padding:15px;
+border-radius:12px;
+margin-bottom:15px;
+box-shadow:0 6px 20px rgba(0,0,0,0.08);
+transition:0.3s;
+}
+
+#monitorList > div:hover{
+transform:translateY(-3px);
+}
+
+/* STATUS COLORS */
+.green{
+color:#00b894;
+text-shadow:0 0 6px rgba(0,255,150,0.4);
+}
+
+.red{
+color:#ff4d4f;
+text-shadow:0 0 6px rgba(255,0,0,0.3);
+}
+
+/* GENERATED RESULT BOX */
+#genResult{
+margin-top:15px;
+padding:15px;
+border-radius:10px;
+background:#f1f5f9;
+box-shadow:0 4px 10px rgba(0,0,0,0.05);
+}
+
+/* MOBILE */
+@media(max-width:600px){
+body{
+padding:15px;
+}
+
+.card{
+padding:15px;
+}
+}
+
+</style>
+</head>
+
+<body>
+
+<h2>Admin Panel</h2>
+
+<div style="margin-bottom:20px;">
+<button onclick="showTab('main')">Main Panel</button>
+<button onclick="showTab('generate')">Generate Panel</button>
+<button onclick="showTab('monitor')">Monitor</button>
+<button onclick="showTab('sessions')">Sessions</button>
+</div>
+<!-- MATCH SETTINGS -->
+
+<div id="mainTab">
+  <div class="card">
+<h3>Featured Match</h3>
+<select id="fTeam1"></select>
+vs
+<select id="fTeam2"></select>
+<br>
+Favoured:
+<select id="favoured"></select>
+<br>
+<input type="date" id="fDate">
+<br>
+<button onclick="openMatch()">Open Match</button>
+<button onclick="closeMatch()">Close Match</button>
+<br>
+<input type="number" step="0.1" id="team1Odds" placeholder="Team 1 Odds">
+<input type="number" step="0.1" id="team2Odds" placeholder="Team 2 Odds">
+<br>
+<button onclick="updateOdds()">Update Odds</button>
+<br>
+</div>
+<h3>Match Control</h3>
+
+
+<div class="card">
+<h3>Upcoming 1</h3>
+<select id="u1Team1"></select>
+vs
+<select id="u1Team2"></select>
+<br>
+<input type="date" id="u1Date">
+</div>
+
+<div class="card">
+<h3>Upcoming 2</h3>
+<select id="u2Team1"></select>
+vs
+<select id="u2Team2"></select>
+<br>
+<input type="date" id="u2Date">
+</div>
+<div class="card">
+<h3>Set Match Result</h3>
+
+<select id="matchSelect"></select>
+
+<br><br>
+<h3>Toss</h3>
+<button onclick="openToss()">Open Toss</button>
+<button onclick="closeToss()">Close Toss</button>
+<br><br>
+
+<select id="tossWinner">
+<option value="1">Team 1</option>
+<option value="2">Team 2</option>
+</select>
+
+<button onclick="setToss()">Declare Winner</button>
+<br><br>
+Winner:
+<select id="winnerSelect">
+<option value="1">Team 1</option>
+<option value="2">Team 2</option>
+</select>
+
+<br><br>
+
+<button onclick="setResult()">Set Result</button>
+
+</div>
+<button onclick="updateMatches()">Update Matches</button>
+<div class="card">
+<h3>Rapid Bet Control</h3>
+
+<select id="rapidMatch"></select>
+
+<br><br>
+
+<select id="rapidTeam">
+<option value="1">Team 1</option>
+<option value="2">Team 2</option>
+</select>
+
+<br><br>
+
+<button onclick="openRapid()">Open Rapid Bet</button>
+<button onclick="closeRapid()">Close Rapid Bet</button>
+</div>
+<h3>Rapid Result</h3>
+
+<select id="rapidWinner">
+<option value="1">Team 1</option>
+<option value="2">Team 2</option>
+</select>
+
+<br><br>
+
+<button onclick="setRapidResult()">Set Rapid Result</button>
+<div class="card">
+<h3>Player Betting Setup</h3>
+
+<h4>Top Scorer (4 Players)</h4>
+<div id="scorerBox"></div>
+
+<h4>Top Wicket Taker (4 Players)</h4>
+<div id="wicketBox"></div>
+
+<br>
+<button onclick="savePlayerBets()">Save Players</button>
+<div class="card">
+<h3>Player Market Control</h3>
+
+<button onclick="toggleMarket('scorer', true)">Open Top Scorer</button>
+<button onclick="toggleMarket('scorer', false)">Close Top Scorer</button>
+
+<br><br>
+
+<button onclick="toggleMarket('wicket', true)">Open Top Wicket</button>
+<button onclick="toggleMarket('wicket', false)">Close Top Wicket</button>
+</div>
+</div>
+<h3>Player Results</h3>
+
+Top Scorer:
+<select id="topScorerWinner"></select>
+
+<br><br>
+
+Top Wicket:
+<select id="topWicketWinner"></select>
+
+<br><br>
+
+<button onclick="setPlayerResult()">Set Player Result</button>
+<!-- ADD MONEY REQUESTS -->
+
+<div class="card">
+<h3>Add Money Requests</h3>
+<div id="paymentList"></div>
+</div>
+
+<!-- WITHDRAW REQUESTS -->
+
+<div class="card">
+<h3>Withdraw Requests</h3>
+<div id="withdrawList"></div>
+</div>
+</div>
+<div id="generateTab" style="display:none;" class="card">
+<h3>Generate Minor Admin</h3>
+
+<button onclick="createSubAdmin()">Generate</button>
+
+<div id="genResult"></div>
+</div>
+<div id="monitorTab" style="display:none;" class="card">
+<h3>Monitor Panels</h3>
+<div id="monitorList"></div>
+</div>
+<div id="sessionsTab" style="display:none;" class="card">
+
+<h3>Session Control</h3>
+
+<div id="sessionAdminList"></div>
+
+</div>
+<script>
+  let CSRF_TOKEN = null;
+
+// fetch token once
+async function loadCSRF(){
+  try{
+    const res = await fetch("/csrf-token", {
+      credentials: "include"
+    });
+    const data = await res.json();
+    CSRF_TOKEN = data.csrfToken;
+  }catch(e){
+    console.error("CSRF load error");
+  }
+}
+
+// wrapper for ALL POST requests
+async function secureFetch(url, options = {}){
+  if(!CSRF_TOKEN){
+    await loadCSRF();
+  }
+
+  options.headers = {
+    ...(options.headers || {}),
+    "Content-Type": "application/json",
+    "CSRF-Token": CSRF_TOKEN
+  };
+
+  options.credentials = "include";
+
+  return fetch(url, options);
+}
+
+// load token on page start
+loadCSRF();
+function loadMatches(){
+
+secureFetch("/matches")
+.then(res=>res.json())
+.then(data=>{
+
+let select = document.getElementById("matchSelect");
+select.innerHTML = "";
+
+data.forEach(m=>{
+
+// ✅ ONLY SHOW FEATURED MATCH
+if(m.status === "featured"){
+
+let opt = document.createElement("option");
+opt.value = m.id;
+opt.text = `Match ${m.id} - ${m.team1_name} vs ${m.team2_name}`;
+select.appendChild(opt);
+
+}
+
+});
+
+});
+loadPlayerResultOptions();
+}
+
+loadMatches();
+function setResult(){
+
+let match_id = document.getElementById("matchSelect").value;
+let winner = document.getElementById("winnerSelect").value;
+
+secureFetch("/setResult",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({
+  match_id:match_id,
+  winner:winner,
+  type:"normal"   // ✅ ADD THIS
+})
+})
+.then(res=>res.text())
+.then(msg=>alert(msg));
+
+}
+/* LOAD TEAMS */
+
+secureFetch("/teams")
+.then(res=>res.json())
+.then(data=>{
+
+["fTeam1","fTeam2","favoured","u1Team1","u1Team2","u2Team1","u2Team2"]
+.forEach(id=>{
+
+let select=document.getElementById(id);
+
+data.forEach(team=>{
+let opt=document.createElement("option");
+opt.value=team.id;
+opt.text=team.name;
+select.appendChild(opt);
+});
+
+});
+
+});
+
+/* UPDATE MATCHES */
+
+function updateMatches(){
+
+secureFetch("/updateMatches",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({
+team1Odds: team1Odds.value ? parseFloat(team1Odds.value) : null,
+team2Odds: team2Odds.value ? parseFloat(team2Odds.value) : null,
+featuredTeam1:fTeam1.value,
+featuredTeam2:fTeam2.value,
+favoured:favoured.value,
+fDate:fDate.value,
+
+up1Team1:u1Team1.value,
+up1Team2:u1Team2.value,
+u1Date:u1Date.value,
+
+up2Team1:u2Team1.value,
+up2Team2:u2Team2.value,
+u2Date:u2Date.value
+
+
+})
+})
+.then(async res=>{
+  const text = await res.text();
+
+  if(!res.ok){
+    alert("Error: " + text);
+    return;
+  }
+
+  alert(text);
+})
+
+}
+
+/* LOAD PAYMENT REQUESTS */
+
+function loadPayments(){
+
+secureFetch("/paymentRequests")
+.then(async res => {
+  if(!res.ok){
+    const text = await res.text();
+    throw new Error(text);
+  }
+  return res.json();
+})
+.then(data=>{
+
+paymentList.innerHTML="";
+
+data.forEach(req=>{
+
+let div = document.createElement("div");
+div.className = "req";
+
+// name + email
+let name = document.createElement("b");
+name.textContent = req.name;
+
+let email = document.createElement("span");
+email.textContent = ` (${req.email})`;
+
+div.appendChild(name);
+div.appendChild(email);
+div.appendChild(document.createElement("br"));
+
+// amount
+let amt = document.createElement("div");
+amt.textContent = "Amount: " + req.amount;
+div.appendChild(amt);
+
+// txn
+let txn = document.createElement("div");
+txn.textContent = "Txn ID: " + req.transaction_id;
+div.appendChild(txn);
+
+// button
+let btn = document.createElement("button");
+btn.textContent = "Approve";
+btn.onclick = () => approvePayment(req.id);
+
+div.appendChild(btn);
+paymentList.appendChild(div);
+
+});
+
+});
+
+}
+
+/* LOAD WITHDRAW REQUESTS */
+
+function loadWithdraws(){
+
+secureFetch("/withdrawRequests")
+.then(async res => {
+  if(!res.ok){
+    const text = await res.text();
+    throw new Error(text);
+  }
+  return res.json();
+})
+.then(data=>{
+
+withdrawList.innerHTML="";
+
+data.forEach(req=>{
+
+let div=document.createElement("div");
+div.className="req";
+
+
+// name
+let name = document.createElement("b");
+name.textContent = req.name;
+
+// email
+let email = document.createElement("span");
+email.textContent = ` (${req.email})`;
+
+div.appendChild(name);
+div.appendChild(email);
+div.appendChild(document.createElement("br"));
+
+// amount
+let amt = document.createElement("div");
+amt.textContent = "Amount: " + req.amount;
+div.appendChild(amt);
+
+// UPI
+let upi = document.createElement("div");
+upi.textContent = "UPI: " + req.upi_id;
+div.appendChild(upi);
+
+// button
+let btn = document.createElement("button");
+btn.textContent = "Approve";
+btn.onclick = () => approveWithdraw(req.id);
+
+div.appendChild(btn);
+
+withdrawList.appendChild(div);
+
+});
+
+});
+
+}
+
+/* APPROVE PAYMENT */
+
+function approvePayment(id){
+
+secureFetch("/approvePayment",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({id})
+})
+.then(res=>res.text())
+.then(msg=>{
+alert(msg);
+loadPayments();
+});
+
+}
+
+/* APPROVE WITHDRAW */
+
+function approveWithdraw(id){
+
+secureFetch("/approveWithdraw",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({id})
+})
+.then(res=>res.text())
+.then(msg=>{
+alert(msg);
+loadWithdraws();
+});
+
+}
+
+/* INIT LOAD */
+loadPayments();
+loadWithdraws();
+
+function showTab(tab){
+
+document.getElementById("mainTab").style.display="none";
+document.getElementById("generateTab").style.display="none";
+document.getElementById("monitorTab").style.display="none";
+
+if(tab==="main") document.getElementById("mainTab").style.display="block";
+if(tab==="generate") document.getElementById("generateTab").style.display="block";
+if(tab==="monitor"){
+  document.getElementById("monitorTab").style.display="block";
+  loadMonitor();
+}
+if(tab==="sessions"){
+  document.getElementById("sessionsTab").style.display="block";
+  loadSessionAdmin();
+}
+}
+function createSubAdmin(){
+
+secureFetch("/createSubAdmin",{
+method:"POST"
+})
+.then(res=>res.json())
+.then(data=>{
+
+let box = document.getElementById("genResult");
+box.innerHTML = ""; // clear safely
+
+let msg = document.createElement("div");
+msg.textContent = "Created ✅";
+box.appendChild(msg);
+
+let user = document.createElement("div");
+user.textContent = "User: " + data.username;
+box.appendChild(user);
+
+let pass = document.createElement("div");
+pass.textContent = "Pass: " + data.password;
+box.appendChild(pass);
+
+let ref = document.createElement("div");
+ref.textContent = "Referral: " + data.referral;
+box.appendChild(ref);
+
+});
+
+}
+function loadMonitor(){
+
+secureFetch("/adminStats")
+.then(async res=>{
+  if(!res.ok){
+    alert("Not logged in as admin. Please login again.");
+    return null;
+  }
+  return res.json();
+})
+.then(data=>{
+  if(!data || !Array.isArray(data)) return;
+
+  let box = document.getElementById("monitorList");
+box.innerHTML = "";
+
+data.forEach(panel=>{
+let header = document.createElement("div");
+
+// admin name
+let h4 = document.createElement("h4");
+h4.textContent = panel.admin.username;
+header.appendChild(h4);
+
+// block button
+let blockBtn = document.createElement("button");
+blockBtn.textContent = panel.admin.is_blocked ? "Unblock" : "Block";
+blockBtn.onclick = () => blockAdmin(panel.admin.id);
+header.appendChild(blockBtn);
+
+// delete button
+let delBtn = document.createElement("button");
+delBtn.textContent = "Delete";
+delBtn.onclick = () => deleteAdmin(panel.admin.id);
+header.appendChild(delBtn);
+
+header.appendChild(document.createElement("br"));
+header.appendChild(document.createElement("br"));
+
+box.appendChild(header);
+
+panel.users.forEach(u=>{
+
+let table = document.createElement("table");
+table.style.width = "100%";
+table.style.marginTop = "10px";
+table.style.fontSize = "12px";
+table.border = "1";
+
+let headerRow = document.createElement("tr");
+
+["Match","Type","Choice","Amt","Odds","Status","Payout"]
+.forEach(text=>{
+  let th = document.createElement("th");
+  th.textContent = text;
+  headerRow.appendChild(th);
+});
+
+table.appendChild(headerRow);
+
+u.bets.forEach(b=>{
+
+let match = b.team1 && b.team2 ? `${b.team1} vs ${b.team2}` : "Session";
+
+let choice = b.session_choice || b.player_name || b.team || "-";
+
+let tr = document.createElement("tr");
+
+function td(text){
+  let cell = document.createElement("td");
+  cell.textContent = text;
+  return cell;
+}
+
+tr.appendChild(td(match));
+tr.appendChild(td(b.type));
+tr.appendChild(td(choice));
+tr.appendChild(td("₹" + b.amount));
+tr.appendChild(td(b.odds));
+tr.appendChild(td(b.status));
+tr.appendChild(td(b.payout || 0));
+
+table.appendChild(tr);
+
+});
+
+
+
+let card = document.createElement("div");
+card.className = "card";
+
+// user info
+let title = document.createElement("div");
+let name = document.createElement("b");
+name.textContent = u.name;
+
+let email = document.createElement("small");
+email.textContent = u.email;
+
+title.appendChild(name);
+title.appendChild(document.createElement("br"));
+title.appendChild(email);
+card.appendChild(title);
+
+// balance
+let bal = document.createElement("div");
+bal.textContent = "₹" + u.balance;
+bal.style.fontWeight = "bold";
+card.appendChild(bal);
+
+// add table safely
+card.appendChild(table);
+
+// finally append
+box.appendChild(card);
+
+});
+
+
+
+});
+
+});
+
+}
+function blockAdmin(id){
+
+secureFetch("/blockAdmin",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({id})
+})
+.then(res=>res.text())
+.then(msg=>{
+alert(msg);
+loadMonitor(); // refresh
+});
+
+}
+
+function deleteAdmin(id){
+
+if(!confirm("Delete this admin?")) return;
+
+secureFetch("/deleteAdmin",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({id})
+})
+.then(res=>res.text())
+.then(msg=>{
+alert(msg);
+loadMonitor(); // refresh
+});
+
+}
+function openRapid(){
+
+secureFetch("/openRapid",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({
+  team: rapidTeam.value
+})
+})
+.then(res=>res.text())
+.then(msg=>alert(msg));
+
+}
+function openToss(){
+secureFetch("/openToss",{method:"POST"})
+.then(res=>res.text())
+.then(alert);
+}
+
+function setToss(){
+
+let match_id = document.getElementById("matchSelect").value;
+let winner = document.getElementById("tossWinner").value;
+
+secureFetch("/setResult",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({
+  match_id:match_id,
+  winner:winner,
+  type:"toss"   // ✅ IMPORTANT
+})
+})
+.then(res=>res.text())
+.then(msg=>alert(msg));
+
+}
+function closeToss(){
+secureFetch("/closeToss",{method:"POST"})
+.then(res=>res.text())
+.then(msg=>alert(msg));
+}
+function closeRapid(){
+secureFetch("/closeRapid",{method:"POST"})
+.then(res=>res.text())
+.then(msg=>alert(msg));
+}
+function openMatch(){
+secureFetch("/openMatch",{method:"POST"})
+.then(res=>res.text())
+.then(msg=>{
+alert(msg);
+location.reload(); // ✅ ADD THIS
+});
+}
+
+function closeMatch(){
+secureFetch("/closeMatch",{method:"POST"})
+.then(res=>res.text())
+.then(msg=>{
+alert(msg);
+location.reload();
+});
+}
+function updateOdds(){
+
+secureFetch("/updateOdds",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({
+  team1Odds: document.getElementById("team1Odds").value,
+  team2Odds: document.getElementById("team2Odds").value
+})
+})
+.then(res=>res.text())
+.then(msg=>alert(msg));
+
+}
+let featuredMatch = null;
+
+// get featured match
+secureFetch("/matches")
+.then(res=>res.json())
+.then(data=>{
+  featuredMatch = data.find(m=>m.status==="featured");
+
+  console.log("FEATURED:", featuredMatch); // debug
+
+  buildPlayerUI();   // builds dropdowns
+});
+
+function buildPlayerUI(){
+
+  let scorerBox = document.getElementById("scorerBox");
+  let wicketBox = document.getElementById("wicketBox");
+
+  scorerBox.innerHTML="";
+  wicketBox.innerHTML="";
+
+  for(let i=0;i<4;i++){
+
+    scorerBox.innerHTML += `
+      <div>
+        <select id="scorer_player_${i}"></select>
+        <input type="number" id="scorer_odds_${i}" placeholder="Odds">
+      </div>
+    `;
+
+    wicketBox.innerHTML += `
+      <div>
+        <select id="wicket_player_${i}"></select>
+        <input type="number" id="wicket_odds_${i}" placeholder="Odds">
+      </div>
+    `;
+  }
+
+  loadPlayersIntoDropdowns();
+}
+function loadPlayersIntoDropdowns(){
+
+  secureFetch(`/playersByTeams?team1=${featuredMatch.team1_id}&team2=${featuredMatch.team2_id}`)
+  .then(res=>res.json())
+  .then(players=>{
+
+    for(let i=0;i<4;i++){
+
+      let s = document.getElementById(`scorer_player_${i}`);
+      let w = document.getElementById(`wicket_player_${i}`);
+
+      [s,w].forEach(select=>{
+
+        select.innerHTML = `<option value="">Select Player</option>`;
+
+        players.forEach(p=>{
+          select.innerHTML += `
+            <option value="${p.name}" data-team="${p.team_id}">
+              ${p.name}
+            </option>
+          `;
+        });
+
+      });
+
+    }
+
+  });
+
+}
+function savePlayerBets(){
+
+  let players = [];
+
+  for(let i=0;i<4;i++){
+
+    let sSelect = document.getElementById(`scorer_player_${i}`);
+    let sName = sSelect.value;
+    let sOdds = document.getElementById(`scorer_odds_${i}`).value;
+
+    if(sName){
+      players.push({
+        name: sName,
+        team_id: sSelect.options[sSelect.selectedIndex].dataset.team,
+        type: "top_scorer",
+        odds: parseFloat(sOdds)
+      });
+    }
+
+    let wSelect = document.getElementById(`wicket_player_${i}`);
+    let wName = wSelect.value;
+    let wOdds = document.getElementById(`wicket_odds_${i}`).value;
+
+    if(wName){
+      players.push({
+        name: wName,
+        team_id: wSelect.options[wSelect.selectedIndex].dataset.team,
+        type: "top_wicket",
+        odds: parseFloat(wOdds)
+      });
+    }
+  }
+
+  secureFetch("/setPlayerBets",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({
+      match_id: featuredMatch.id,
+      players
+    })
+  })
+  .then(res=>res.text())
+  .then(msg=>alert(msg));
+}
+function loadPlayerResultOptions(){
+
+secureFetch("/playerBets")
+.then(res=>res.json())
+.then(data=>{
+
+  let scorer = document.getElementById("topScorerWinner");
+  let wicket = document.getElementById("topWicketWinner");
+
+  scorer.innerHTML="";
+  wicket.innerHTML="";
+
+  data.forEach(p=>{
+
+    let option = `<option value="${p.player_name}">${p.player_name}</option>`;
+
+    if(p.bet_type === "top_scorer"){
+      scorer.innerHTML += option;
+    }else{
+      wicket.innerHTML += option;
+    }
+
+  });
+
+});
+}
+function setPlayerResult(){
+
+let match_id = document.getElementById("matchSelect").value;
+
+let top_scorer = document.getElementById("topScorerWinner").value;
+let top_wicket = document.getElementById("topWicketWinner").value;
+
+secureFetch("/setResult",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({
+  match_id:match_id,
+  type:"player",   // ✅ IMPORTANT
+  top_scorer: top_scorer,
+  top_wicket: top_wicket
+})
+})
+.then(res=>res.text())
+.then(msg=>alert(msg));
+
+}
+function setRapidResult(){
+
+let match_id = document.getElementById("matchSelect").value;
+let winner = document.getElementById("rapidWinner").value;
+
+secureFetch("/setResult",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({
+  match_id:match_id,
+  winner:winner,
+  type:"rapid"
+})
+})
+.then(res=>res.text())
+.then(msg=>alert(msg));
+
+}
+function createSession(){
+
+let q = document.getElementById("sessionQuestion").value;
+let type = document.getElementById("sessionType").value;
+let odds = document.getElementById("sessionOdds").value;
+
+secureFetch("/createSessionQuestion",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({question:q,type:type,odds:odds})
+})
+.then(res=>res.text())
+.then(msg=>{
+alert(msg);
+loadSessions();
+});
+
+}
+function loadSessions(){
+
+secureFetch("/sessionQuestions")
+.then(res=>res.json())
+.then(data=>{
+
+let box = document.getElementById("sessionList");
+box.innerHTML="";
+
+data.forEach(q=>{
+
+let div = document.createElement("div");
+
+div.innerHTML = `
+<b>${q.question}</b><br>
+Type: ${q.type}<br>
+Odds: ${q.odds}<br>
+
+<select id="res_${q.id}">
+  <option value="yes">YES</option>
+  <option value="no">NO</option>
+</select>
+
+<button onclick="setSessionResult(${q.id})">Set Result</button>
+
+<hr>
+`;
+
+box.appendChild(div);
+
+});
+
+});
+
+}
+function setSessionResult(id){
+
+let result = document.getElementById("res_"+id).value;
+
+secureFetch("/setSessionResult",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({question_id:id,result:result})
+})
+.then(res=>res.text())
+.then(msg=>{
+alert(msg);
+loadSessions();
+});
+
+}
+function loadSessionAdmin(){
+
+secureFetch("/sessionQuestions")
+.then(res=>res.json())
+.then(data=>{
+
+let box = document.getElementById("sessionAdminList");
+box.innerHTML="";
+
+data.forEach(q=>{
+
+let optionsHTML = "";
+
+q.options.forEach(opt=>{
+  optionsHTML += `<option value="${opt}">${opt}</option>`;
+});
+
+let div = document.createElement("div");
+
+div.innerHTML = `
+<div style="margin-bottom:15px; padding:10px; border:1px solid #ddd; border-radius:10px;">
+
+<b>${q.question}</b><br>
+Type: ${q.type} | Odds: ${q.odds} <br>
+
+Status: ${q.is_open ? "🟢 OPEN" : "🔴 CLOSED"} <br><br>
+
+<select id="ans_${q.id}">
+${optionsHTML}
+</select>
+
+<button onclick="setSession(${q.id})">Set Result</button>
+<button onclick="toggleSession(${q.id})">Toggle Open/Close</button>
+
+</div>
+`;
+
+box.appendChild(div);
+
+});
+
+});
+}
+function setSession(id){
+
+let val = document.getElementById("ans_"+id).value;
+
+secureFetch("/setSessionResult",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({
+question_id:id,
+correct:val
+})
+})
+.then(res=>res.text())
+.then(msg=>{
+alert(msg);
+loadSessionAdmin();
+});
+
+}
+
+function toggleSession(id){
+
+secureFetch("/toggleSession",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({question_id:id})
+})
+.then(res=>res.text())
+.then(msg=>{
+alert(msg);
+loadSessionAdmin();
+});
+
+}
+function toggleMarket(type, status){
+
+secureFetch("/togglePlayerMarket",{
+method:"POST",
+body:JSON.stringify({ type, status })
+})
+.then(res=>res.json())
+.then(data=>{
+  if(data.success){
+    alert("Updated ✅");
+  }
+});
+}
+setInterval(loadMonitor, 5000);
+</script>
+
+</body>
+</html>

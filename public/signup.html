@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Signup</title>
+<link rel="stylesheet" href="style.css">
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+
+}
+
+/* Background (subtle shift) */
+body{
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+
+/* stronger contrast between shades */
+background:linear-gradient(
+120deg,
+#020617,
+#020617,
+#0b3a6f,
+#0f172a,
+#020617
+);
+
+background-size:400% 400%;
+animation:subtleShift 18s ease-in-out infinite;
+
+position:relative;
+overflow:hidden;
+}
+@keyframes subtleShift{
+0%{background-position:0% 50%;}
+25%{background-position:50% 100%;}
+50%{background-position:100% 50%;}
+75%{background-position:50% 0%;}
+100%{background-position:0% 50%;}
+}
+/* Soft blur blobs */
+body::before{
+content:"";
+position:fixed;
+width:350px;
+height:350px;
+top:15%;
+left:10%;
+background:radial-gradient(circle, rgba(59,130,246,0.15), transparent);
+filter:blur(120px);
+z-index:-1;
+}
+
+body::after{
+content:"";
+position:fixed;
+width:300px;
+height:300px;
+bottom:10%;
+right:10%;
+background:radial-gradient(circle, rgba(34,197,94,0.12), transparent);
+filter:blur(120px);
+z-index:-1;
+}
+
+/* GLASS CARD */
+.container{
+position:relative;
+overflow:hidden;
+
+width:360px;
+padding:35px;
+border-radius:20px;
+
+/* stronger glass */
+background:rgba(255,255,255,0.08);
+backdrop-filter:blur(25px) saturate(140%);
+-webkit-backdrop-filter:blur(25px) saturate(140%);
+
+border:1px solid rgba(255,255,255,0.15);
+
+/* depth */
+box-shadow:
+0 20px 60px rgba(0,0,0,0.7),
+inset 0 1px 0 rgba(255,255,255,0.15);
+
+color:#e2e8f0;
+transition:0.3s ease;
+}
+
+/* gradient glow */
+.container::before{
+content:"";
+position:absolute;
+inset:-2px;
+border-radius:inherit;
+
+background:linear-gradient(
+135deg,
+rgba(59,130,246,0.25),
+rgba(255,255,255,0.05),
+rgba(34,197,94,0.2)
+);
+
+filter:blur(25px);
+opacity:0.6;
+z-index:-1;
+}
+
+/* inner shine */
+.container::after{
+content:"";
+position:absolute;
+inset:0;
+border-radius:inherit;
+
+background:linear-gradient(
+to bottom right,
+rgba(255,255,255,0.18),
+rgba(255,255,255,0.02)
+);
+
+pointer-events:none;
+}
+
+/* hover */
+.container:hover{
+transform:translateY(-6px);
+box-shadow:
+0 30px 80px rgba(0,0,0,0.8),
+0 0 40px rgba(59,130,246,0.15);
+}
+
+/* heading */
+h2{
+text-align:center;
+margin-bottom:15px;
+font-weight:600;
+}
+
+/* FIXED visible paragraph */
+p{
+width:100%;
+text-align:center;
+margin:8px 0 20px;
+
+font-size:14px;
+font-weight:500;
+color:#e2e8f0;
+
+display:flex;
+justify-content:center;
+align-items:center;
+gap:6px; /* spacing between emoji and text */
+
+opacity:0.9;
+}
+
+/* INPUTS */
+input{
+width:100%;
+padding:12px;
+margin:10px 0;
+
+border-radius:12px;
+border:1px solid rgba(255,255,255,0.08);
+
+background:rgba(255,255,255,0.05);
+color:#e2e8f0;
+padding-right:60px; /* space for timer */
+outline:none;
+transition:all 0.25s ease;
+}
+
+/* placeholder */
+input::placeholder{
+color:#94a3b8;
+}
+
+/* HOVER effect */
+input:hover{
+background:rgba(255,255,255,0.08);
+border-color:rgba(255,255,255,0.15);
+}
+
+/* FOCUS effect */
+input:focus{
+background:rgba(255,255,255,0.1);
+border-color:rgba(59,130,246,0.6);
+box-shadow:0 0 0 2px rgba(59,130,246,0.2);
+transform:scale(1.02);
+}
+
+/* BUTTON */
+button{
+margin-top:12px;
+padding:12px;
+width:100%;
+
+border:none;
+border-radius:12px;
+
+background:linear-gradient(135deg,#3b82f6,#22c55e);
+color:white;
+
+font-size:15px;
+font-weight:600;
+
+cursor:pointer;
+transition:all 0.25s ease;
+}
+
+button:hover{
+transform:translateY(-2px);
+box-shadow:0 10px 25px rgba(59,130,246,0.3);
+}
+
+button:active{
+transform:scale(0.97);
+}
+
+/* links */
+.link{
+text-align:center;
+margin-top:18px;
+font-size:14px;
+color:#94a3b8;
+}
+
+a{
+color:#38bdf8;
+text-decoration:none;
+font-weight:500;
+}
+
+a:hover{
+text-decoration:underline;
+}
+
+/* mobile */
+@media(max-width:400px){
+.container{
+width:90%;
+padding:25px;
+}
+}
+/* Logo / Header */
+.logo{
+position:absolute;
+top:30px;
+
+font-size:22px;
+font-weight:600;
+letter-spacing:2px;
+
+color:#e2e8f0;
+
+/* subtle gradient text */
+background:linear-gradient(90deg,#3b82f6,#22c55e);
+-webkit-background-clip:text;
+-webkit-text-fill-color:transparent;
+
+opacity:0.9;
+}
+@media(max-width:400px){
+.logo{
+top:20px;
+font-size:18px;
+}
+}
+/* POPUP BACKGROUND */
+.popup-bg{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.6);
+display:none;
+justify-content:center;
+align-items:center;
+z-index:9999;
+}
+
+/* POPUP BOX (glass style) */
+.popup-box{
+width:300px;
+padding:25px;
+border-radius:16px;
+
+background:rgba(255,255,255,0.08);
+backdrop-filter:blur(20px);
+
+color:#e2e8f0;
+text-align:center;
+
+box-shadow:
+0 20px 60px rgba(0,0,0,0.7),
+0 0 20px rgba(59,130,246,0.2);
+
+animation:fadeUp 0.3s ease;
+}
+
+.popup-box button{
+margin-top:15px;
+padding:10px 18px;
+border:none;
+border-radius:10px;
+background:linear-gradient(135deg,#3b82f6,#22c55e);
+color:white;
+cursor:pointer;
+}
+.password-wrapper{
+  position:relative;
+}
+
+.eye{
+  position:absolute;
+  right:12px;
+  top:50%;
+  transform:translateY(-50%);
+  cursor:pointer;
+  font-size:18px;
+}
+.loader{
+  border:3px solid rgba(255,255,255,0.2);
+  border-top:3px solid white;
+  border-radius:50%;
+  width:18px;
+  height:18px;
+  animation:spin 1s linear infinite;
+  display:inline-block;
+}
+
+@keyframes spin{
+  100%{transform:rotate(360deg);}
+}
+
+.timer{
+  position:absolute;
+  right:12px;
+
+  font-size:12px;
+  color:#94a3b8;
+
+  pointer-events:none;
+}
+
+.resend{
+  position:absolute;
+  right:12px;
+
+  font-size:12px;
+  color:#38bdf8;
+  cursor:pointer;
+  display:none;
+}
+.otp-wrapper{
+  width:100%;
+}
+
+/* input container */
+.otp-input-box{
+  position:relative;
+  width:100%;
+}
+
+/* timer + resend inside input */
+.timer, .resend{
+  position:absolute;
+  right:12px;
+  top:50%;
+  transform:translateY(-50%);
+  font-size:12px;
+}
+
+/* note below input */
+.otp-note{
+  font-size:12px;
+  color:#94a3b8;
+  margin-top:6px;
+  text-align:left;
+}
+/* =========================
+   TABLET DEVICES (768px)
+========================= */
+@media (max-width: 768px){
+
+  body{
+    padding:20px;
+    align-items:flex-start;
+  }
+
+  .container{
+    width:100%;
+    max-width:420px;
+    margin-top:60px;
+    padding:30px;
+  }
+
+  .logo{
+    top:15px;
+    font-size:20px;
+  }
+
+  h2{
+    font-size:22px;
+  }
+
+  p{
+    font-size:13px;
+  }
+
+  input{
+    padding:11px;
+    font-size:14px;
+  }
+
+  button{
+    padding:11px;
+    font-size:14px;
+  }
+}
+
+
+/* =========================
+   MOBILE DEVICES (480px)
+========================= */
+@media (max-width: 480px){
+
+  body{
+    padding:10px;
+  }
+
+  .container{
+    width:92%;          /* was 100% → reduce width */
+    max-width:320px;    /* limit size */
+    padding:18px;       /* reduce height (less padding) */
+    border-radius:14px;
+  }
+
+  h2{
+    font-size:18px;
+    margin-bottom:10px; /* tighter spacing */
+  }
+
+  p{
+    font-size:12px;
+    margin-bottom:12px;
+  }
+
+  input{
+    padding:9px;        /* smaller inputs */
+    margin:8px 0;
+    font-size:13px;
+  }
+
+  button{
+    padding:9px;
+    font-size:13px;
+    margin-top:10px;
+  }
+
+  .link{
+    font-size:12px;
+    margin-top:14px;
+  }
+}
+
+
+/* =========================
+   SMALL MOBILE (360px)
+========================= */
+@media (max-width: 360px){
+
+  .container{
+    padding:18px;
+  }
+
+  h2{
+    font-size:18px;
+  }
+
+  input{
+    font-size:12px;
+  }
+
+  button{
+    font-size:12px;
+  }
+}
+</style>
+</head>
+
+<body>
+<div class="logo">QUEEN BOOK</div>
+<div class="container">
+<h2>Create Account</h2>
+<p >
+🎁 50 Pts Bonus on Signup
+</p>
+<form onsubmit="return verifyAndSignup(event)">
+
+<input type="text" name="name" placeholder="Full Name" required>
+
+<input type="email" name="email" placeholder="Email" required>
+<button type="button" id="otpBtn" onclick="sendOtp()">Send OTP</button>
+
+<div class="otp-wrapper">
+
+  <div class="otp-input-box">
+    <input type="text" id="otp" inputmode="numeric" pattern="[0-9]*" maxlength="6">
+    <span id="timer" class="timer"></span>
+    <span id="resend" class="resend" onclick="sendOtp()">Resend</span>
+  </div>
+
+  <div id="otpNote" class="otp-note" style="display:none;">
+    If you do not see the OTP in your inbox, please check your spam folder.
+  </div>
+
+</div>
+<div class="password-wrapper">
+  <input type="password" id="password" name="password" placeholder="Password" required>
+  <span class="eye" onclick="togglePassword()" id="eye">👁️</span>
+</div>
+
+<input type="text" name="referral_code" placeholder="Referral Code (optional)">
+
+<button type="submit">Sign Up</button>
+
+</form>
+
+<div class="link">
+Already have an account? <a href="login.html">Login</a>
+</div>
+
+</div>
+<script>
+  let CSRF_TOKEN = null;
+
+// fetch token once
+async function loadCSRF(){
+  try{
+    const res = await fetch("/csrf-token", {
+      credentials: "include"
+    });
+    const data = await res.json();
+    CSRF_TOKEN = data.csrfToken;
+  }catch(e){
+    console.error("CSRF load error");
+  }
+}
+
+// wrapper for ALL POST requests
+async function secureFetch(url, options = {}){
+  if(!CSRF_TOKEN){
+    await loadCSRF();
+  }
+
+options.headers = {
+  ...(options.headers || {}),
+  "Content-Type": "application/json",
+  "CSRF-Token": CSRF_TOKEN
+};
+
+  options.credentials = "include";
+
+  return fetch(url, options);
+}
+
+// load token on page start
+loadCSRF();
+function showPopup(msg){
+  document.getElementById("popupText").innerText = msg;
+  document.getElementById("popupBg").style.display = "flex";
+}
+
+function closePopup(){
+  document.getElementById("popupBg").style.display = "none";
+}
+async function sendOtp(){
+  let btn = document.getElementById("otpBtn");
+  let email = document.querySelector("input[name='email']").value;
+
+  if(!email){
+    showPopup("Enter email first");
+    return;
+  }
+
+  btn.innerHTML = '<span class="loader"></span>';
+  btn.disabled = true;
+
+  try {
+
+    const res = await secureFetch("/sendOtp", {
+      method: "POST",
+      body: JSON.stringify({ email })
+    });
+
+    if(!res.ok){
+      throw new Error("Request failed");
+    }
+
+    const data = await res.json();
+
+    btn.innerHTML = "Send OTP";
+
+    if(!data.success){
+      btn.disabled = false;
+      showPopup(data.message || "Failed to send OTP ❌");
+      return;
+    }
+
+    // ✅ SUCCESS
+    showPopup("OTP sent ✅");
+
+    document.getElementById("otpBtn").style.display = "none";
+    document.getElementById("otp").style.display = "block";
+    document.getElementById("otpNote").style.display = "block";
+
+    startTimer();
+
+  } catch (err) {
+    console.error(err);
+    btn.innerHTML = "Send OTP";
+    btn.disabled = false;
+    showPopup("Server error ❌");
+  }
+}
+async function verifyAndSignup(e){
+  e.preventDefault();
+
+  let email = document.querySelector("input[name='email']").value;
+  let otp = document.getElementById("otp").value;
+
+  if(!otp){
+    showPopup("Enter OTP");
+    return false;
+  }
+
+  try {
+
+    const res = await secureFetch("/verifyOtp",{
+      method:"POST",
+      body: JSON.stringify({ email, otp })
+    });
+
+    if(!res.ok){
+      throw new Error("Verification failed");
+    }
+
+    const data = await res.json();
+
+    if(!data.success){
+      showPopup(data.msg || "Wrong OTP ❌");
+      return;
+    }
+
+    // ✅ OTP verified → now signup
+    const signupRes = await secureFetch("/signup",{
+      method:"POST",
+      body: JSON.stringify({
+        name: document.querySelector("input[name='name']").value,
+        email,
+        password: document.getElementById("password").value,
+        referral_code: document.querySelector("input[name='referral_code']").value
+      })
+    });
+
+    const signupData = await signupRes.json();
+
+    if(signupData.success){
+      showPopup("Signup successful ✅");
+
+      setTimeout(()=>{
+        window.location.href = "login.html";
+      },1000);
+    }else{
+      showPopup(signupData.message || "Signup failed ❌");
+    }
+
+  } catch(err){
+    console.error(err);
+    showPopup("Server error ❌");
+  }
+
+  return false;
+}
+function togglePassword(){
+  let pass = document.getElementById("password");
+  let eye = document.getElementById("eye");
+
+  if(pass.type === "password"){
+    pass.type = "text";
+    eye.innerText = "👁️";
+  } else {
+    pass.type = "password";
+    eye.innerText = "🙈"; // hidden style
+  }
+}
+let countdown;
+function startTimer(){
+let time = 30;
+
+let timer = document.getElementById("timer");
+let resend = document.getElementById("resend");
+let btn = document.getElementById("otpBtn");
+
+resend.style.display = "none";
+
+countdown = setInterval(()=>{
+  time--;
+  timer.innerText = time + "s";
+
+  if(time <= 0){
+    clearInterval(countdown);
+    timer.innerText = "";
+    resend.style.display = "block";
+
+    // ⭐ ENABLE BUTTON AFTER 30s
+    btn.disabled = false;
+  }
+
+},1000);
+}
+
+
+</script>
+<div class="popup-bg" id="popupBg">
+  <div class="popup-box">
+    <div id="popupText"></div>
+    <button onclick="closePopup()">OK</button>
+  </div>
+</div>
+</body>
+</html>

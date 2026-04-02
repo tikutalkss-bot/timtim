@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Profile</title>
+<link rel="stylesheet" href="style.css">
+<style>
+
+/* RESET */
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+
+}
+
+/* BACKGROUND */
+body{
+background:linear-gradient(135deg,#08081c,#020220);
+min-height:100vh;
+color:#222;
+  display:flex;            /* 👈 ADD */
+  flex-direction:column;   /* 👈 ADD */
+}
+
+/* NAVBAR */
+header{
+background:rgba(15,15,25,0.85);
+backdrop-filter:blur(12px);
+color:white;
+padding:18px;
+display:flex;
+align-items:center;
+justify-content:center;
+position:sticky;
+top:0;
+font-size:22px;
+font-weight:600;
+border-bottom:1px solid rgba(0,255,200,0.2);
+box-shadow:0 5px 25px rgba(0,0,0,0.2);
+z-index: 3;
+}
+footer{
+margin-top:30px;
+}
+/* MENU */
+.menu-btn{
+position:absolute;
+left:15px;
+font-size:22px;
+cursor:pointer;
+transition:0.3s;
+
+}
+
+.menu-btn:hover{
+color:#00ffc3;
+transform:scale(1.2);
+}
+
+/* SIDEBAR */
+.sidebar{
+position:fixed;
+top:0;
+left:-240px;
+width:240px;
+height:100%;
+background:rgba(10,10,20,0.95);
+backdrop-filter:blur(15px);
+padding-top:70px;
+transition:0.4s ease;
+box-shadow:5px 0 30px rgba(0,0,0,0.4);
+z-index: 2;
+}
+
+.sidebar a{
+display:block;
+padding:15px 20px;
+color:#ccc;
+text-decoration:none;
+transition:0.3s;
+}
+
+.sidebar a:hover{
+color:#00ffc3;
+background:rgba(0,255,200,0.08);
+padding-left:25px;
+}
+
+/* CONTAINER */
+.container{
+max-width:500px;
+margin:auto;
+padding:40px 20px;
+text-align:center;
+width: 100%;
+  flex:1; /* 👈 PUSHES FOOTER DOWN */
+}
+
+/* PROFILE CARD */
+.profile-card{
+background:white;
+padding:40px 20px;
+border-radius:18px;
+box-shadow:0 10px 30px rgba(0,0,0,0.08);
+position:relative;
+overflow:hidden;
+transition:0.3s;
+}
+
+/* neon border glow */
+.profile-card::before{
+content:'';
+position:absolute;
+inset:0;
+border-radius:18px;
+padding:1px;
+background:linear-gradient(120deg,#00ffc3,transparent,#00ffc3);
+-webkit-mask:
+linear-gradient(#fff 0 0) content-box,
+linear-gradient(#fff 0 0);
+-webkit-mask-composite:xor;
+mask-composite:exclude;
+opacity:0;
+transition:0.4s;
+}
+
+.profile-card:hover::before{
+opacity:1;
+}
+
+.profile-card:hover{
+transform:translateY(-5px);
+}
+
+/* PROFILE IMAGE */
+.profile-img{
+width:130px;
+height:130px;
+border-radius:50%;
+margin:auto;
+display:flex;
+align-items:center;
+justify-content:center;
+overflow:hidden;
+background:linear-gradient(135deg,#00ffc3,#0f172a);
+padding:3px;
+box-shadow:0 0 20px rgba(0,255,200,0.3);
+transition:0.4s;
+}
+
+.profile-img img{
+width:100%;
+height:100%;
+object-fit:cover;
+border-radius:50%;
+background:white;
+}
+
+/* subtle glow pulse */
+.profile-img:hover{
+transform:scale(1.05);
+box-shadow:0 0 30px rgba(0,255,200,0.6);
+}
+
+/* EMAIL */
+.email{
+margin-top:20px;
+font-size:18px;
+font-weight:600;
+color:#0f172a;
+}
+
+/* NAME */
+.name{
+margin-top:8px;
+font-size:15px;
+color:#666;
+}
+
+/* LOGOUT BUTTON */
+.logout-btn{
+margin-top:25px;
+padding:12px 25px;
+background:#0f172a;
+color:#00ffc3;
+border:none;
+border-radius:8px;
+cursor:pointer;
+font-size:15px;
+font-weight:600;
+transition:all 0.3s ease;
+box-shadow:0 0 10px rgba(0,255,200,0.2);
+position:relative;
+overflow:hidden;
+}
+
+/* hover */
+.logout-btn:hover{
+background:#020617;
+transform:translateY(-2px);
+box-shadow:0 0 20px rgba(0,255,200,0.6);
+}
+
+/* click */
+.logout-btn:active{
+transform:scale(0.95);
+}
+
+/* neon sweep */
+.logout-btn::after{
+content:'';
+position:absolute;
+top:0;
+left:-100%;
+width:100%;
+height:100%;
+background:linear-gradient(120deg,transparent,rgba(0,255,200,0.4),transparent);
+transition:0.5s;
+}
+
+.logout-btn:hover::after{
+left:100%;
+}
+
+/* MOBILE */
+@media(max-width:500px){
+.container{
+padding:30px 15px;
+}
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="sidebar" id="sidebar">
+<a href="home.html">Home</a>
+<a href="wallet.html">Wallet</a>
+<a href="history.html">History</a>
+<a href="session.html">Sessions</a>
+</div>
+
+<header>
+<div class="menu-btn" onclick="toggleMenu()">☰</div>
+Queen Book
+</header>
+
+<div class="container">
+
+<div class="profile-card">
+
+<div class="profile-img">
+<img src="https://cdn-icons-png.flaticon.com/512/847/847969.png">
+</div>
+
+<div class="email" id="userEmail">
+user@email.com
+</div>
+
+<div class="name" id="userName">
+John Doe
+</div>
+
+<button class="logout-btn" onclick="logout()" id="logoutBtn">
+Logout
+</button>
+
+</div>
+
+</div>
+
+<script>
+let CSRF_TOKEN = null;
+
+// fetch token once
+async function loadCSRF(){
+  try{
+    const res = await fetch("/csrf-token", {
+      credentials: "include"
+    });
+    const data = await res.json();
+    CSRF_TOKEN = data.csrfToken;
+  }catch(e){
+    console.error("CSRF load error");
+  }
+}
+
+// wrapper for ALL POST requests
+async function secureFetch(url, options = {}){
+  if(!CSRF_TOKEN){
+    await loadCSRF();
+  }
+
+  options.headers = {
+    ...(options.headers || {}),
+    "Content-Type": "application/json",
+    "CSRF-Token": CSRF_TOKEN
+  };
+
+  options.credentials = "include";
+
+  return fetch(url, options);
+}
+
+// load token on page start
+loadCSRF();
+function toggleMenu(){
+
+let menu=document.getElementById("sidebar");
+
+if(menu.style.left==="0px"){
+menu.style.left="-220px";
+}else{
+menu.style.left="0px";
+}
+
+}
+
+/* Logout */
+
+function logout(){
+
+  let btn = document.getElementById("logoutBtn");
+  if(btn.disabled) return;
+
+  btn.disabled = true;
+  btn.innerText = "Logging out...";
+
+  secureFetch("/logout", {
+    method: "POST"
+  })
+  .then(()=>{
+    window.location.href = "login.html";
+  });
+
+}
+
+/* Load user info */
+
+fetch("/user")
+.then(res=>{
+  if(!res.ok){
+    window.location.href = "login.html";
+    return null;
+  }
+  return res.json();
+})
+.then(data=>{
+  if(!data) return;
+
+  document.getElementById("userEmail").innerText = data.email;
+  document.getElementById("userName").innerText = data.name;
+});
+</script>
+<footer style="background:#000000; color:#ffffff; padding:15px; text-align:center; font-size:12px; border-top:1px solid #ddd;">
+All transactions conducted on this website are carried out exclusively using virtual currency. No real-world currency is utilized, involved, or affected in any manner. The platform does not intend to represent, misuse, or disrespect any form of legal tender whatsoever.
+</footer>
+</body>
+</html>

@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Admin Login</title>
+<meta http-equiv="Content-Security-Policy" content="frame-ancestors 'none';">
+<link rel="stylesheet" href="style.css">
+<style>
+/* RESET */
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+
+}
+
+/* BACKGROUND (dark premium) */
+body{
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+background:linear-gradient(135deg,#020617,#0f172a,#020617);
+background-size:400% 400%;
+animation:bgMove 10s ease infinite;
+}
+
+/* animated bg */
+@keyframes bgMove{
+0%{background-position:0% 50%;}
+50%{background-position:100% 50%;}
+100%{background-position:0% 50%;}
+}
+
+/* LOGIN BOX */
+.box{
+background:rgba(255,255,255,0.05);
+backdrop-filter:blur(15px);
+-webkit-backdrop-filter:blur(15px);
+padding:35px;
+border-radius:18px;
+width:320px;
+text-align:center;
+color:white;
+box-shadow:0 0 40px rgba(0,0,0,0.6);
+position:relative;
+overflow:hidden;
+animation:fadeUp 0.8s ease;
+z-index:1;
+}
+
+/* neon border */
+.box::before{
+content:'';
+position:absolute;
+inset:0;
+border-radius:18px;
+padding:1px;
+background:linear-gradient(120deg,#00ffc3,transparent,#00ffc3);
+
+-webkit-mask:
+linear-gradient(#fff 0 0) content-box,
+linear-gradient(#fff 0 0);
+-webkit-mask-composite:xor;
+mask-composite:exclude;
+
+/* 🔥 CRITICAL FIX */
+pointer-events:none;
+z-index:0;
+}
+
+/* animation */
+@keyframes fadeUp{
+from{opacity:0; transform:translateY(20px);}
+to{opacity:1; transform:translateY(0);}
+}
+
+/* TITLE */
+h2{
+margin-bottom:15px;
+font-weight:600;
+letter-spacing:1px;
+}
+
+/* INPUT */
+input{
+width:100%;
+padding:12px;
+margin:12px 0;
+border:none;
+border-radius:10px;
+background:rgba(255,255,255,0.08);
+color:white;
+outline:none;
+transition:0.3s;
+}
+
+/* placeholder */
+input::placeholder{
+color:#aaa;
+}
+
+/* focus */
+input:focus{
+background:rgba(255,255,255,0.12);
+box-shadow:0 0 10px rgba(0,255,200,0.5);
+transform:scale(1.02);
+}
+
+/* PASSWORD BOX */
+.pass-box{
+position:relative;
+}
+
+/* eye icon */
+.eye{
+position:absolute;
+right:12px;
+top:50%;
+transform:translateY(-50%);
+cursor:pointer;
+color:#00ffc3;
+transition:0.3s;
+}
+
+.eye:hover{
+transform:translateY(-50%) scale(1.2);
+}
+
+/* BUTTON */
+button{
+margin-top:10px;
+padding:12px;
+width:100%;
+background:#0f172a;
+color:#00ffc3;
+border:none;
+border-radius:10px;
+cursor:pointer;
+font-weight:600;
+transition:all 0.3s ease;
+box-shadow:0 0 12px rgba(0,255,200,0.2);
+position:relative;
+overflow:hidden;
+}
+
+/* hover */
+button:hover{
+background:#020617;
+box-shadow:0 0 20px rgba(0,255,200,0.6);
+transform:translateY(-2px);
+}
+
+/* click */
+button:active{
+transform:scale(0.95);
+}
+
+/* neon sweep */
+button::after{
+content:'';
+position:absolute;
+top:0;
+left:-100%;
+width:100%;
+height:100%;
+background:linear-gradient(120deg,transparent,rgba(0,255,200,0.4),transparent);
+transition:0.5s;
+}
+
+button:hover::after{
+left:100%;
+}
+</style>
+</head>
+
+<body>
+
+<div class="box">
+<h2>Admin Login</h2>
+
+<input type="text" id="user" placeholder="User ID">
+
+<div class="pass-box">
+<input type="password" id="pass" placeholder="Password">
+<span class="eye" onclick="togglePass()">👁</span>
+</div>
+
+<button id="loginBtn" onclick="login()">Login</button>
+</div>
+
+<script>
+  if(location.protocol !== "https:" && location.hostname !== "localhost"){
+  location.href = "https://" + location.host + location.pathname;
+}
+const secureAPI = (function(){
+
+  let CSRF_TOKEN = null;
+
+  async function loadCSRF(){
+    try{
+      const res = await fetch("/csrf-token", {
+        credentials: "include"
+      });
+      const data = await res.json();
+      CSRF_TOKEN = data.csrfToken;
+    }catch(e){
+      console.error("CSRF load error");
+    }
+  }
+
+  async function secureFetch(url, options = {}){
+
+    if(!CSRF_TOKEN){
+      await loadCSRF();
+    }
+
+    options.headers = {
+      ...(options.headers || {}),
+      "Content-Type": "application/json",
+      "csrf-token": CSRF_TOKEN
+    };
+
+    options.credentials = "include";
+
+    return fetch(url, options);
+  }
+
+  // load once
+  loadCSRF();
+
+  return {
+    fetch: secureFetch
+  };
+
+})();
+function togglePass(){
+let p=document.getElementById("pass");
+p.type = (p.type==="password")?"text":"password";
+}
+
+function validateInput(username, password){
+
+  // username rules
+  if(!username || username.length < 3){
+    alert("Username must be at least 3 characters");
+    return false;
+  }
+
+  // allow only safe characters (no scripts)
+  const userRegex = /^[a-zA-Z0-9_]+$/;
+  if(!userRegex.test(username)){
+    alert("Username contains invalid characters");
+    return false;
+  }
+
+  // password rules
+  if(!password || password.length < 8){
+    alert("Password must be at least 8 characters");
+    return false;
+  }
+
+  return true;
+}
+let lastLoginTime = 0;
+const LOGIN_COOLDOWN = 3000; // 3 seconds
+let isLoggingIn = false;
+async function login(){
+const now = Date.now();
+if(now - lastLoginTime < LOGIN_COOLDOWN){
+  alert("Please wait a few seconds before trying again");
+  return;
+}
+lastLoginTime = now;
+  if(isLoggingIn) return;
+
+  let btn = document.getElementById("loginBtn");
+
+  let u = document.getElementById("user").value.trim();
+  let p = document.getElementById("pass").value;
+
+  if(!validateInput(u, p)){
+    return;
+  }
+
+  try{
+
+    isLoggingIn = true;
+    btn.disabled = true;
+    btn.innerText = "Logging in...";
+
+    // 🔒 Try main login silently
+    let res = await secureAPI.fetch("/mainAdminLogin",{
+      method:"POST",
+      body:JSON.stringify({ username:u, password:p })
+    });
+
+    let data = await res.json();
+
+    if(data.success){
+      window.location.href = "/admin";
+      return;
+    }
+
+    // 🔒 fallback silently (NO info leak)
+    res = await secureAPI.fetch("/adminLogin",{
+      method:"POST",
+      body:JSON.stringify({ username:u, password:p })
+    });
+
+    data = await res.json();
+
+    if(data.success){
+      window.location.href = "minor-admin.html";
+    }else{
+     alert("Invalid credentials");
+
+// clear sensitive data
+document.getElementById("pass").value = "";// ✅ generic message
+    }
+
+  }catch(e){
+    alert("Login failed"); // ✅ generic error
+  }finally{
+    isLoggingIn = false;
+    btn.disabled = false;
+    btn.innerText = "Login";
+  }
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login</title>
+<link rel="stylesheet" href="style.css">
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+
+}
+
+/* Background (same as signup) */
+body{
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+
+background:linear-gradient(
+120deg,
+#020617,
+#020617,
+#0a2540,
+#0f172a,
+#020617
+);
+
+background-size:400% 400%;
+animation:subtleShift 18s ease-in-out infinite;
+
+position:relative;
+overflow:hidden;
+}
+
+/* Animation */
+@keyframes subtleShift{
+0%{background-position:0% 50%;}
+50%{background-position:100% 50%;}
+100%{background-position:0% 50%;}
+}
+
+/* Glow blobs */
+body::before{
+content:"";
+position:fixed;
+width:350px;
+height:350px;
+top:15%;
+left:10%;
+background:radial-gradient(circle, rgba(59,130,246,0.15), transparent);
+filter:blur(120px);
+z-index:-1;
+}
+
+body::after{
+content:"";
+position:fixed;
+width:300px;
+height:300px;
+bottom:10%;
+right:10%;
+background:radial-gradient(circle, rgba(34,197,94,0.12), transparent);
+filter:blur(120px);
+z-index:-1;
+}
+
+/* Logo */
+.logo{
+position:absolute;
+top:30px;
+
+font-size:22px;
+font-weight:600;
+letter-spacing:2px;
+
+background:linear-gradient(90deg,#3b82f6,#22c55e);
+-webkit-background-clip:text;
+-webkit-text-fill-color:transparent;
+}
+
+/* Card */
+.container{
+position:relative;
+overflow:hidden;
+
+width:360px;
+padding:35px;
+border-radius:20px;
+
+background:rgba(255,255,255,0.08);
+backdrop-filter:blur(25px) saturate(140%);
+-webkit-backdrop-filter:blur(25px) saturate(140%);
+
+border:1px solid rgba(255,255,255,0.15);
+
+box-shadow:
+0 20px 60px rgba(0,0,0,0.7),
+inset 0 1px 0 rgba(255,255,255,0.15);
+
+color:#e2e8f0;
+transition:0.3s ease;
+}
+
+/* Gradient blur glow */
+.container::before{
+content:"";
+position:absolute;
+inset:-2px;
+border-radius:inherit;
+
+background:linear-gradient(
+135deg,
+rgba(59,130,246,0.25),
+rgba(255,255,255,0.05),
+rgba(34,197,94,0.2)
+);
+
+filter:blur(25px);
+opacity:0.6;
+z-index:-1;
+}
+
+/* Inner shine */
+.container::after{
+content:"";
+position:absolute;
+inset:0;
+border-radius:inherit;
+
+background:linear-gradient(
+to bottom right,
+rgba(255,255,255,0.18),
+rgba(255,255,255,0.02)
+);
+
+pointer-events:none;
+}
+
+/* Hover */
+.container:hover{
+transform:translateY(-6px);
+box-shadow:
+0 30px 80px rgba(0,0,0,0.8),
+0 0 40px rgba(59,130,246,0.15);
+}
+
+/* Heading */
+h2{
+text-align:center;
+margin-bottom:15px;
+font-weight:600;
+}
+
+/* FIXED paragraph */
+p{
+width:100%;
+display:flex;
+justify-content:center;
+align-items:center;
+gap:6px;
+
+margin-bottom:18px;
+font-size:14px;
+font-weight:500;
+
+color:#e2e8f0;
+opacity:0.9;
+}
+
+/* Inputs */
+input{
+width:100%;
+padding:12px;
+margin:10px 0;
+
+border-radius:12px;
+border:1px solid rgba(255,255,255,0.08);
+
+background:rgba(255,255,255,0.05);
+color:#e2e8f0;
+
+outline:none;
+transition:all 0.25s ease;
+}
+
+input::placeholder{
+color:#94a3b8;
+}
+
+input:hover{
+background:rgba(255,255,255,0.08);
+border-color:rgba(255,255,255,0.15);
+}
+
+input:focus{
+background:rgba(255,255,255,0.1);
+border-color:rgba(59,130,246,0.6);
+box-shadow:0 0 0 2px rgba(59,130,246,0.2);
+transform:scale(1.02);
+}
+
+/* Button */
+button{
+margin-top:12px;
+padding:12px;
+width:100%;
+
+border:none;
+border-radius:12px;
+
+background:linear-gradient(135deg,#3b82f6,#22c55e);
+color:white;
+
+font-size:15px;
+font-weight:600;
+
+cursor:pointer;
+transition:all 0.25s ease;
+}
+
+button:hover{
+transform:translateY(-2px);
+box-shadow:0 10px 25px rgba(59,130,246,0.3);
+}
+
+button:active{
+transform:scale(0.97);
+}
+
+/* Links */
+.link{
+text-align:center;
+margin-top:18px;
+font-size:14px;
+color:#94a3b8;
+}
+
+a{
+color:#38bdf8;
+text-decoration:none;
+font-weight:500;
+}
+
+a:hover{
+text-decoration:underline;
+}
+
+/* Mobile */
+@media(max-width:400px){
+.container{
+width:90%;
+padding:25px;
+}
+
+.logo{
+top:20px;
+font-size:18px;
+}
+}
+.password-wrapper{
+  position:relative;
+}
+
+.eye{
+  position:absolute;
+  right:12px;
+  top:50%;
+  transform:translateY(-50%);
+  cursor:pointer;
+  font-size:18px;
+  opacity:0.8;
+}
+/* POPUP */
+.popup-bg{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.6);
+display:none;
+justify-content:center;
+align-items:center;
+z-index:9999;
+}
+
+.popup-box{
+width:300px;
+padding:25px;
+border-radius:16px;
+
+background:rgba(255,255,255,0.08);
+backdrop-filter:blur(20px);
+
+color:#e2e8f0;
+text-align:center;
+
+box-shadow:
+0 20px 60px rgba(0,0,0,0.7),
+0 0 20px rgba(59,130,246,0.2);
+}
+
+.popup-box button{
+margin-top:15px;
+padding:10px 18px;
+border:none;
+border-radius:10px;
+background:linear-gradient(135deg,#3b82f6,#22c55e);
+color:white;
+cursor:pointer;
+}
+/* =========================
+   MOBILE FIX (BETTER UI)
+========================= */
+@media (max-width: 480px){
+
+  body{
+    padding:10px;
+    align-items:center; /* center vertically (fix tall feel) */
+  }
+
+  .container{
+    width:92%;          /* reduce width */
+    max-width:320px;    /* prevent full stretch */
+    padding:18px;       /* reduce height */
+    border-radius:14px;
+  }
+
+  h2{
+    font-size:18px;
+    margin-bottom:10px;
+  }
+
+  p{
+    font-size:12px;
+    margin-bottom:12px;
+  }
+
+  input{
+    padding:9px;
+    margin:8px 0;
+    font-size:13px;
+    border-radius:10px;
+  }
+
+  button{
+    padding:9px;
+    font-size:13px;
+    margin-top:10px;
+  }
+
+  .link{
+    font-size:12px;
+    margin-top:14px;
+  }
+
+  .logo{
+    top:12px;
+    font-size:16px;
+  }
+}
+</style>
+</head>
+
+<body>
+<div class="logo">QUEEN BOOK</div>
+<div class="container">
+<h2>Login</h2>
+<p >
+🎁 50 Pts Bonus on First Login
+</p>
+<form onsubmit="return loginUser(event)">
+<input type="email" name="email" placeholder="Email" required>
+
+<div class="password-wrapper">
+  <input type="password" id="password" name="password" placeholder="Password" required>
+  <span class="eye" onclick="togglePassword()" id="eye">👁️</span>
+</div>
+
+<button type="submit" id="loginBtn">Login</button>
+
+</form>
+
+<div class="link">
+Don't have an account? <a href="signup.html">Sign Up</a>
+</div>
+
+</div>
+<script>
+  let CSRF_TOKEN = null;
+
+// fetch token once
+async function loadCSRF(){
+  try{
+    const res = await fetch("/csrf-token", {
+      credentials: "include"
+    });
+    const data = await res.json();
+    CSRF_TOKEN = data.csrfToken;
+  }catch(e){
+    console.error("CSRF load error");
+  }
+}
+
+// wrapper for ALL POST requests
+async function secureFetch(url, options = {}){
+  if(!CSRF_TOKEN){
+    await loadCSRF();
+  }
+
+  options.headers = {
+    ...(options.headers || {}),
+    "Content-Type": "application/json",
+    "CSRF-Token": CSRF_TOKEN
+  };
+
+  options.credentials = "include";
+
+  return fetch(url, options);
+}
+
+// load token on page start
+loadCSRF();
+function togglePassword(){
+  let pass = document.getElementById("password");
+  let eye = document.getElementById("eye");
+
+  if(pass.type === "password"){
+    pass.type = "text";
+    eye.innerText = "👁️"; // visible
+  } else {
+    pass.type = "password";
+    eye.innerText = "🙈"; // hidden (cut style)
+  }
+}
+function showPopup(msg){
+  document.getElementById("popupText").innerText = msg;
+  document.getElementById("popupBg").style.display = "flex";
+}
+
+function closePopup(){
+  document.getElementById("popupBg").style.display = "none";
+}
+async function loginUser(e){
+  e.preventDefault();
+let btn = document.getElementById("loginBtn");
+
+if(btn.disabled) return false;
+
+btn.disabled = true;
+btn.innerText = "Logging in...";
+  let email = document.querySelector("input[name='email']").value;
+  let password = document.querySelector("input[name='password']").value;
+if(!email || !password){
+  showPopup("Please fill all fields");
+  btn.disabled = false;
+  btn.innerText = "Login";
+  return false;
+}
+
+if(password.length < 8){
+  showPopup("Password must be at least 8 characters");
+  btn.disabled = false;
+  btn.innerText = "Login";
+  return false;
+}
+  try {
+
+    const res = await secureFetch("/login",{
+      method:"POST",
+      body: JSON.stringify({ email, password })
+    });
+
+    const data = await res.json();
+
+    if(!data.success){
+  showPopup("Invalid email or password ❌");
+  btn.disabled = false;
+  btn.innerText = "Login";
+  return;
+}
+
+    showPopup("Login successful ✅");
+
+   
+  setTimeout(() => {
+  window.location.href = "/home";
+}, 500);
+
+
+  } catch(err){
+  console.error(err);
+  showPopup("Server error ❌");
+
+  btn.disabled = false;
+  btn.innerText = "Login";
+}
+
+  return false;
+}
+</script>
+<div class="popup-bg" id="popupBg">
+  <div class="popup-box">
+    <div id="popupText"></div>
+    <button onclick="closePopup()">OK</button>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,1624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Home</title>
+<link rel="stylesheet" href="style.css">
+<style>
+
+/* RESET */
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+
+}
+
+/* BACKGROUND */
+body{
+background:linear-gradient(135deg,#08081c,#020220);
+min-height:100vh;
+color:#222;
+}
+
+/* NAVBAR (glass + neon edge) */
+header{
+  background:rgba(2,6,23,0.85); /* dark glass */
+  backdrop-filter:blur(18px) saturate(140%);
+  -webkit-backdrop-filter:blur(18px);
+
+  color:#e2e8f0;
+
+  padding:18px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  position:sticky;
+  top:0;
+
+  font-size:22px;
+  font-weight:600;
+
+  border-bottom:1px solid rgba(255,255,255,0.08);
+
+  /* glow + depth */
+  box-shadow:
+    0 10px 30px rgba(0,0,0,0.6),
+    0 0 20px rgba(59,130,246,0.15);
+
+  z-index:10;
+}
+
+/* MENU */
+.menu-btn{
+position:absolute;
+left:15px;
+font-size:22px;
+cursor:pointer;
+transition:0.3s;
+}
+
+.menu-btn:hover{
+color:#00ffc3;
+transform:scale(1.2);
+}
+
+/* BALANCE */
+header span{
+color:#00ffc3;
+text-shadow:0 0 8px rgba(0,255,195,0.7);
+}
+
+/* SIDEBAR */
+.sidebar{
+position:fixed;
+top:0;
+left:-240px;
+width:240px;
+height:100%;
+background:rgba(15,15,25,0.95);
+backdrop-filter:blur(15px);
+padding-top:70px;
+transition:0.4s ease;
+box-shadow:5px 0 30px rgba(0,0,0,0.4);
+z-index: 2;
+}
+
+.sidebar a{
+display:block;
+padding:15px 20px;
+color:#ccc;
+text-decoration:none;
+font-size:16px;
+transition:0.3s;
+}
+
+.sidebar a:hover{
+color:#00ffc3;
+background:rgba(0,255,200,0.08);
+padding-left:25px;
+}
+
+/* MAIN */
+.container{
+max-width:950px;
+margin:auto;
+padding:20px;
+}
+
+/* CARDS (light + neon edge) */
+.card{
+background:white;
+border-radius:16px;
+padding:20px;
+margin-bottom:20px;
+box-shadow:0 10px 30px rgba(0,0,0,0.08);
+transition:0.3s;
+position:relative;
+overflow:hidden;
+z-index:1;
+}
+
+/* neon border glow */
+.card::before{
+content:'';
+position:absolute;
+inset:0;
+border-radius:16px;
+padding:1px;
+background:linear-gradient(120deg,#00ffc3,transparent,#00ffc3);
+-webkit-mask:
+linear-gradient(#fff 0 0) content-box,
+linear-gradient(#fff 0 0);
+-webkit-mask-composite:xor;
+mask-composite:exclude;
+opacity:0;
+transition:0.4s;
+pointer-events:none; /* ✅ THIS FIXES IT */
+z-index:0;
+}
+
+.card:hover::before{
+opacity:1;
+}
+
+.card:hover{
+transform:translateY(-5px);
+box-shadow:0 20px 50px rgba(0,0,0,0.12);
+}
+
+/* MATCH */
+.match{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-top:15px;
+}
+footer{
+margin-top:30px;
+}
+.team{
+text-align:center;
+width:40%;
+transition:0.3s;
+}
+
+.team:hover{
+transform:scale(1.08);
+}
+
+.team img{
+width:60px;
+height:60px;
+margin-bottom:5px;
+}
+
+.vs{
+font-weight:600;
+color:#888;
+}
+
+/* ODDS (neon highlight) */
+.odds{
+font-size:18px;
+margin:6px 0;
+color:#00b894;
+font-weight:600;
+text-shadow:0 0 6px rgba(0,255,200,0.4);
+}
+
+/* BUTTONS (dark + neon glow) */
+button{
+padding:10px 18px;
+background:#0f172a;
+color:#00ffc3;
+border:none;
+border-radius:8px;
+cursor:pointer;
+font-weight:600;
+transition:all 0.3s ease;
+position:relative;
+overflow:hidden;
+box-shadow:0 0 10px rgba(0,255,200,0.2);
+}
+
+button:hover{
+background:#020617;
+transform:translateY(-2px);
+box-shadow:0 0 18px rgba(0,255,200,0.6);
+}
+
+/* neon sweep */
+button::after{
+content:'';
+position:absolute;
+top:0;
+left:-100%;
+width:100%;
+height:100%;
+background:linear-gradient(120deg,transparent,rgba(0,255,200,0.4),transparent);
+transition:0.5s;
+}
+
+button:hover::after{
+left:100%;
+}
+
+/* BET BOX */
+.betbox{
+margin-top:15px;
+text-align:center;
+display:none;
+animation:fadeUp 0.4s ease;
+position:relative;
+z-index:5;
+}
+.betbox input{
+position:relative;
+z-index:10;
+}
+@keyframes fadeUp{
+from{opacity:0; transform:translateY(10px);}
+to{opacity:1; transform:translateY(0);}
+}
+
+/* INPUT */
+input{
+padding:12px;
+border-radius:8px;
+border:none;
+width:160px;
+text-align:center;
+background:#f1f5f9;
+transition:0.3s;
+}
+
+input:focus{
+outline:none;
+box-shadow:0 0 0 2px #00ffc333;
+transform:scale(1.05);
+}
+
+/* UPCOMING */
+.upcoming{
+display:flex;
+gap:20px;
+}
+
+.up-match{
+flex:1;
+background:white;
+padding:15px;
+border-radius:12px;
+box-shadow:0 6px 20px rgba(0,0,0,0.08);
+transition:0.3s;
+}
+
+.up-match:hover{
+transform:translateY(-4px);
+box-shadow:0 10px 25px rgba(0,0,0,0.12);
+}
+
+.up-row{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-top:10px;
+}
+
+/* BET LIST */
+.bet-item{
+display:flex;
+align-items:center;
+justify-content:space-between;
+padding:12px;
+border-bottom:1px solid #eee;
+transition:0.3s;
+}
+
+.bet-item:hover{
+background:#f9fafb;
+}
+
+/* POPUP */
+.popup-bg{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+
+background:rgba(0,0,0,0.5);
+
+display:none;
+justify-content:center;
+align-items:center;
+
+/* 🔥 IMPORTANT FIX */
+z-index:9999;
+}
+
+.popup{
+background:#0f172a;
+color:white;
+padding:25px;
+border-radius:14px;
+width:320px;
+text-align:center;
+box-shadow:0 0 25px rgba(0,255,200,0.4);
+animation:fadeUp 0.3s ease;
+position:relative;
+z-index:10000;
+animation:popupIn 0.3s ease;
+}
+@keyframes popupIn{
+from{
+opacity:0;
+transform:scale(0.9);
+}
+to{
+opacity:1;
+transform:scale(1);
+}
+}
+/* RAPID CARD (highlight) */
+#rapidCard{
+background:linear-gradient(135deg,#ecfeff,#f0fdf4);
+border:2px solid #00ffc344;
+box-shadow:0 0 20px rgba(0,255,200,0.15);
+}
+
+/* MOBILE */
+@media(max-width:768px){
+.match{
+flex-direction:column;
+gap:15px;
+}
+
+.team{
+width:100%;
+}
+
+.upcoming{
+flex-direction:column;
+}
+}
+.up-row img{
+width:42px;
+height:42px;
+object-fit:contain;
+background:white;
+padding:4px;
+border-radius:8px;
+box-shadow:0 4px 10px rgba(0,0,0,0.08);
+transition:0.3s;
+}
+
+/* subtle hover effect */
+.up-row img:hover{
+transform:scale(1.1);
+box-shadow:0 6px 15px rgba(0,0,0,0.12);
+}
+.bet-left img{
+width:36px;
+height:36px;
+object-fit:contain;
+background:white;
+padding:4px;
+border-radius:8px;
+box-shadow:0 4px 10px rgba(0,0,0,0.08);
+transition:0.3s;
+}
+
+/* hover effect */
+.bet-item:hover .bet-left img{
+transform:scale(1.1);
+box-shadow:0 6px 15px rgba(0,0,0,0.15);
+}
+#liveWithdraw{
+  height: 4vh;
+  position: relative;
+  z-index: -1;
+}
+.player-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:12px;
+  border-bottom:1px solid #eee;
+}
+
+.player-left{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.player-left img{
+  width:40px;
+  height:40px;
+  object-fit:contain;
+  background:white;
+  padding:4px;
+  border-radius:8px;
+  box-shadow:0 4px 10px rgba(0,0,0,0.08);
+}
+#sessionCard{
+  background: linear-gradient(135deg,#0f172a,#020617);
+  border: 2px solid transparent;
+  border-radius: 16px;
+  position: relative;
+  overflow: hidden;
+  color: white;
+  text-align: center;
+  animation: pulseGlow 2.5s infinite ease-in-out;
+}
+
+/* 🔥 animated neon border */
+#sessionCard::before{
+  content:'';
+  position:absolute;
+  inset:0;
+  border-radius:16px;
+  padding:1.5px;
+  background:linear-gradient(120deg,#00ffc3,transparent,#00ffc3);
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite:xor;
+  mask-composite:exclude;
+  animation: borderMove 3s linear infinite;
+}
+
+/* ✨ glow pulse */
+@keyframes pulseGlow{
+  0%{ box-shadow:0 0 10px rgba(0,255,200,0.2);}
+  50%{ box-shadow:0 0 25px rgba(0,255,200,0.6);}
+  100%{ box-shadow:0 0 10px rgba(0,255,200,0.2);}
+}
+
+/* 🌊 border animation */
+@keyframes borderMove{
+  0%{ background-position:0% 50%;}
+  100%{ background-position:200% 50%;}
+}
+.how-btn{
+  position:absolute;
+  top:12px;
+  right:12px;
+  background:#020617;
+  color:#00ffc3;
+  border:none;
+  padding:5px 10px;
+  border-radius:6px;
+  font-size:12px;
+  cursor:pointer;
+}
+
+.how-btn:hover{
+  background:#000;
+}
+.top-card-img{
+  width:100%;
+  border-radius:12px;
+  display:block;
+}
+#rapidBetBox{
+  display:none;
+  text-align:center;
+  margin-top:15px;
+  margin-bottom:25px; /* ✅ space from bottom */
+
+  background:rgba(255,255,255,0.05);
+  padding:18px;
+  border-radius:14px;
+
+  box-shadow:0 10px 25px rgba(0,0,0,0.4);
+  backdrop-filter:blur(10px);
+}
+#rapidBetBox input{
+  background:#e2e8f0;
+  color:#000;
+}
+#rapidBetBox button{
+  margin-top:12px;
+}
+#rapidSelectedText{
+  color:#00ffc3;        /* bright neon (visible) */
+  font-weight:600;
+  font-size:16px;
+  margin-bottom:10px;
+  text-shadow:0 0 8px rgba(0,255,200,0.6);
+}
+</style>
+</head>
+
+<body>
+
+<div class="sidebar" id="sidebar">
+<a href="profile.html">Profile</a>
+<a href="wallet.html">Wallet</a>
+<a href="history.html">History</a>
+<a href="session.html">Sessions</a>
+</div>
+
+<header>
+<div class="menu-btn" onclick="toggleMenu()">☰</div>
+Queen Book
+<div style="position:absolute;right:15px;font-size:16px;">
+Pts. <span id="homeBalance">0</span>
+</div>
+</header>
+<div id="liveWithdraw" style="
+background:#000;
+color:#fff;
+overflow:hidden;
+white-space:nowrap;
+padding:8px 0;
+font-size:13px;
+position:relative;
+">
+  <div id="tickerText" style="position:absolute; left:100%;">
+    Loading...
+  </div>
+</div>
+<div class="container">
+  <div class="card">
+  <img src="images/card.png" alt="Card Image" class="top-card-img">
+</div>
+<div class="card" id="tossCard" style="display:none;">
+  <button class="how-btn" onclick="showHowToPlay('toss')">How to play ?</button>
+<h3>Toss</h3>
+
+<div class="match">
+
+<div class="team">
+<img id="t1">
+<div id="n1"></div>
+<button id="tossBtn1" onclick="tossBet(1)">Bet</button>
+</div>
+
+<div class="vs">VS</div>
+
+<div class="team">
+<img id="t2">
+<div id="n2"></div>
+<button id="tossBtn2" onclick="tossBet(2)">Bet</button>
+</div>
+
+</div>
+
+<div class="betbox" id="tossBetBox">
+  <p id="tossSelectedText"></p>
+
+  <input type="number" id="tossAmount" placeholder="20 - 500">
+  
+  <br><br>
+
+  <button onclick="confirmTossBet()">Confirm Bet</button>
+</div>
+<div id="tossClosedText" style="display:none; text-align:center; color:red; margin-top:10px;">
+🔒 Toss Closed
+</div>
+</div>
+<!-- FEATURED MATCH -->
+
+<div class="card" id="matchCard">
+<button class="how-btn" onclick="showHowToPlay('match')">How to play ?</button>
+<h3>Featured Match</h3>
+
+<div id="matchDate" style="text-align:center;color:#555;"></div>
+
+<div class="match">
+
+<div class="team">
+<img id="team1Logo">
+<div id="team1Name"></div>
+<div class="odds" id="team1Odds"></div>
+<button id="team1Bet">Bet</button>
+</div>
+
+<div class="vs">VS</div>
+
+<div class="team">
+<img id="team2Logo">
+<div id="team2Name"></div>
+<div class="odds" id="team2Odds"></div>
+<button id="team2Bet">Bet</button>
+</div>
+
+</div>
+
+<div class="betbox" id="betbox">
+<p id="selectedTeamText"></p>
+<input type="number" id="amount" placeholder="20 - 500">
+<br><br>
+<button onclick="confirmBet()">Confirm Bet</button>
+</div>
+
+</div>
+<div class="card" id="rapidCard"></div>
+
+  <div id="rapidBetBox" style="display:none;text-align:center;margin-top:10px;">
+    <p id="rapidSelectedText"></p>
+    <input type="number" id="rapidAmount" placeholder="20 - 500">
+    <br><br>
+    <button onclick="confirmRapidBet()">Confirm Bet</button>
+  </div>
+  <div class="card" id="sessionCard">
+
+  <h3 style="text-align:center;">🎮 Play sessions now and double your points!</h3>
+
+  <div style="text-align:center; margin-top:15px;">
+    <button class="session-btn" onclick="goToSession()">Play Session</button>
+  </div>
+
+</div>
+<!-- TOP SCORER -->
+<div class="card" id="scorerCard">
+  <h3>🔥 Top Scorer</h3>
+  <button class="how-btn" onclick="showHowToPlay('scorer')">How to play ?</button>
+  <div id="scorerList"></div>
+</div>
+
+<!-- TOP WICKET -->
+<div class="card" id="wicketCard">
+  <h3>🎯 Top Wicket Taker</h3>
+  <button class="how-btn" onclick="showHowToPlay('wicket')">How to play ?</button>
+  <div id="wicketList"></div>
+</div>
+<!-- ONGOING BETS -->
+
+<div class="card">
+<h3>Ongoing Bets</h3>
+<div id="betList"></div>
+</div>
+
+<!-- UPCOMING MATCHES -->
+
+<div class="card">
+
+<h3>Upcoming Matches</h3>
+
+<div class="upcoming">
+
+<div class="up-match">
+<div id="up1Date" style="text-align:center;color:#555;"></div>
+<div class="up-row">
+<img id="up1Logo1">
+<span id="up1Name1"></span>
+<span>VS</span>
+<span id="up1Name2"></span>
+<img id="up1Logo2">
+</div>
+</div>
+
+<div class="up-match">
+<div id="up2Date" style="text-align:center;color:#555;"></div>
+<div class="up-row">
+<img id="up2Logo1">
+<span id="up2Name1"></span>
+<span>VS</span>
+<span id="up2Name2"></span>
+<img id="up2Logo2">
+</div>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<!-- POPUP -->
+
+<div class="popup-bg" id="popupBg">
+<div class="popup">
+<div id="popupText"></div>
+<button onclick="closePopup()">OK</button>
+</div>
+</div>
+<footer>
+  
+</footer>
+<script>
+  let CSRF_TOKEN = null;
+
+// fetch token once
+async function loadCSRF(){
+  try{
+    const res = await fetch("/csrf-token", {
+      credentials: "include"
+    });
+    const data = await res.json();
+    CSRF_TOKEN = data.csrfToken;
+  }catch(e){
+    console.error("CSRF load error");
+  }
+}
+
+// wrapper for ALL POST requests
+async function secureFetch(url, options = {}){
+  if(!CSRF_TOKEN){
+    await loadCSRF();
+  }
+
+  options.headers = {
+    ...(options.headers || {}),
+    "Content-Type": "application/json",
+    "CSRF-Token": CSRF_TOKEN
+  };
+
+  options.credentials = "include";
+
+  return fetch(url, options);
+}
+
+// load token on page start
+loadCSRF();
+let selectedTeamNumber=null;
+let selectedOdds=null;
+let featured=null;
+let selectedTeam=null;
+let selectedLogo=null;
+let lastBetPlayer = null;
+
+/* DATE FORMAT */
+
+function formatDateLabel(dateStr){
+
+if(!dateStr) return "Date: Not set"
+
+let date = new Date(dateStr)
+let today = new Date()
+let tomorrow = new Date()
+tomorrow.setDate(today.getDate()+1)
+
+today.setHours(0,0,0,0)
+tomorrow.setHours(0,0,0,0)
+date.setHours(0,0,0,0)
+
+let day = date.getDate()
+let suffix = ["th","st","nd","rd"][(day%10>3)?0:(day%100-day%10!=10)?day%10:0]
+
+let formatted = `${day}${suffix} ${date.toLocaleString('default',{month:'long'})} ${date.getFullYear()}`
+
+if(date.getTime() === today.getTime()){
+return "🟡 TODAY • " + formatted
+}
+else if(date.getTime() === tomorrow.getTime()){
+return "🔵 TOMORROW • " + formatted
+}
+else{
+return " " + formatted
+}
+
+}
+
+/* MENU */
+
+function toggleMenu(){
+let menu=document.getElementById("sidebar");
+menu.style.left = (menu.style.left==="0px") ? "-220px" : "0px";
+}
+
+/* LOAD MATCHES */
+function loadMatches(){
+fetch("/matches")
+.then(res=>res.json())
+.then(matches=>{
+
+featured = matches.find(m => m.status === "featured");
+
+if(!featured){
+  console.error("No featured match found");
+  return;
+}
+if(!featured.scorer_open){
+  document.getElementById("scorerCard").style.display = "none";
+}else{
+  document.getElementById("scorerCard").style.display = "block";
+}
+
+if(!featured.wicket_open){
+  document.getElementById("wicketCard").style.display = "none";
+}else{
+  document.getElementById("wicketCard").style.display = "block";
+}
+let matchCard = document.getElementById("matchCard");
+if(!featured.match_open){
+
+matchCard.style.opacity = "0.5";
+
+// disable buttons
+team1Bet.disabled = true;
+team2Bet.disabled = true;
+
+}else{
+
+matchCard.style.opacity = "1";
+
+team1Bet.disabled = false;
+team2Bet.disabled = false;
+
+}
+document.getElementById("tossCard").style.display="block";
+
+if(featured.toss_open){
+
+document.getElementById("tossCard").style.opacity="1";
+document.getElementById("tossClosedText").style.display="none";
+
+}else{
+
+document.getElementById("tossCard").style.opacity="0.5";
+document.getElementById("tossClosedText").style.display="block";
+
+}
+// 👇 ADD THIS
+if(!featured.toss_open){
+
+document.getElementById("tossBtn1").disabled = true;
+document.getElementById("tossBtn2").disabled = true;
+
+}else{
+
+document.getElementById("tossBtn1").disabled = false;
+document.getElementById("tossBtn2").disabled = false;
+
+}
+document.getElementById("n1").innerText = featured.team1_name;
+document.getElementById("t1").src = featured.team1_logo;
+
+document.getElementById("n2").innerText = featured.team2_name;
+document.getElementById("t2").src = featured.team2_logo;
+console.log(featured);
+document.getElementById("tossCard").style.display="block";
+
+
+const upcoming = matches.filter(m => m.status === "upcoming")
+
+/* FEATURED */
+
+team1Name.innerText = featured.team1_name
+team1Logo.src = featured.team1_logo
+
+team2Name.innerText = featured.team2_name
+team2Logo.src = featured.team2_logo
+
+matchDate.innerText = "🔴 Today • " + formatDateLabel(featured.match_date)
+
+team1Odds.innerText = featured.team1_odds;
+team2Odds.innerText = featured.team2_odds;
+
+team1Bet.onclick = ()=> openBet(
+  featured.team1_name,
+  featured.team1_logo,
+  1,
+  team1Odds.innerText
+)
+
+team2Bet.onclick = ()=> openBet(
+  featured.team2_name,
+  featured.team2_logo,
+  2,
+  team2Odds.innerText
+)
+
+/* UPCOMING */
+
+up1Name1.innerText = upcoming[0].team1_name
+up1Logo1.src = upcoming[0].team1_logo
+up1Name2.innerText = upcoming[0].team2_name
+up1Logo2.src = upcoming[0].team2_logo
+up1Date.innerText = formatDateLabel(upcoming[0].match_date)
+
+up2Name1.innerText = upcoming[1].team1_name
+up2Logo1.src = upcoming[1].team1_logo
+up2Name2.innerText = upcoming[1].team2_name
+up2Logo2.src = upcoming[1].team2_logo
+up2Date.innerText = formatDateLabel(upcoming[1].match_date)
+loadRapid(featured);
+});
+}
+loadMatches(); // first load
+
+setInterval(loadMatches, 8000); // auto refresh every 3 sec
+/* BETTING */
+
+function openBet(team,logo,teamNumber,odds){
+
+selectedTeam=team
+selectedLogo=logo
+selectedTeamNumber=teamNumber
+selectedOdds=odds
+
+betbox.style.display="block"
+selectedTeamText.innerText="Betting on " + team
+
+}
+
+
+function addBet(team,logo,amt,status="pending",payout=0,type="normal",player=null){
+
+let bet=document.createElement("div")
+bet.className="bet-item"
+
+// 🏷️ TYPE LABEL
+let typeLabel = "🏏 MATCH";
+
+if(type === "toss") typeLabel = "🪙 TOSS";
+if(type === "rapid") typeLabel = "⚡ RAPID";
+if(type === "player") typeLabel = "🎯 PLAYER";
+
+// 🎯 PLAYER NAME
+let playerText = player ? " - " + player : "";
+
+// STATUS
+let statusText = typeLabel + " 🟡 Pending";
+let color = "#999";
+
+if(status==="won"){
+  statusText = typeLabel + " 🟢 Won +" + payout;
+  color = "green";
+}
+else if(status==="lost"){
+  statusText = typeLabel + " 🔴 Lost";
+  color = "red";
+}
+
+let left = document.createElement("div");
+left.className = "bet-left";
+
+let img = document.createElement("img");
+img.src = logo;
+
+let name = document.createElement("span");
+name.textContent = team + playerText;
+
+left.appendChild(img);
+left.appendChild(name);
+
+// right side
+let right = document.createElement("div");
+right.style.textAlign = "right";
+
+let amtDiv = document.createElement("div");
+amtDiv.textContent = "Pts." + amt;
+
+let statusDiv = document.createElement("div");
+statusDiv.style.color = color;
+statusDiv.style.fontSize = "14px";
+statusDiv.textContent = statusText;
+
+right.appendChild(amtDiv);
+right.appendChild(statusDiv);
+
+bet.appendChild(left);
+bet.appendChild(right);
+
+betList.appendChild(bet);
+
+}
+function loadBets(){
+
+fetch("/bets")
+.then(res=>res.json())
+.then(data=>{
+
+betList.innerHTML="";
+
+// ✅ ONLY SHOW PENDING BETS
+data.forEach(b=>{
+
+  // ❌ skip session bets
+  if(b.type === "session" || !b.team) return;
+
+  // ✅ only normal bets
+  if(b.status === "pending"){
+
+    addBet(
+      b.team == 1 ? b.team1_name : b.team2_name,
+      b.team == 1 ? b.team1_logo : b.team2_logo,
+      b.amount,
+      b.status,
+      b.payout,
+      b.type,
+      b.player_name
+    );
+
+  }
+
+});
+
+});
+}
+/* POPUP */
+
+function showPopup(msg){
+popupText.innerText=msg
+popupBg.style.display="flex"
+}
+
+function closePopup(){
+popupBg.style.display="none"
+}
+function showPopupWithButton(msg){
+let box = document.getElementById("popupText");
+box.innerHTML = ""; // clear
+
+let text = document.createElement("div");
+text.textContent = msg;
+
+let br = document.createElement("br");
+
+let btn = document.createElement("button");
+btn.textContent = "Add Money";
+btn.onclick = goToWallet;
+
+box.appendChild(text);
+box.appendChild(br);
+box.appendChild(br.cloneNode());
+box.appendChild(btn);
+document.getElementById("popupBg").style.display="flex"
+}
+
+function goToWallet(){
+window.location.href="wallet.html"
+}
+function loadHomeBalance(){
+fetch("/balance")
+.then(res=>res.json())
+.then(data=>{
+document.getElementById("homeBalance").innerText=data.balance||0;
+});
+}
+fetch("/bonusStatus")
+.then(res=>res.json())
+.then(data=>{
+  if(data.show){
+    showPopup("🎁 50 Pts bonus has been credited!\nPlay Now!");
+  }
+});
+loadBets();
+loadHomeBalance();
+function loadRapid(featured){
+
+let card = document.getElementById("rapidCard");
+
+let isOpen = featured.rapid_open;
+
+let dullStyle = isOpen ? "" : "opacity:0.5;";
+let disabled = isOpen ? "" : "pointer-events:none;";
+
+let text = isOpen 
+? "🔥 Rapid Bet(10x)"
+: "⏳ This session will open during last 6 overs";
+
+let button = "";
+
+if(isOpen){
+
+if(featured.rapid_team == 1){
+button = `<button onclick="placeRapid(1)">Bet on ${featured.team1_name}</button>`;
+}else{
+button = `<button onclick="placeRapid(2)">Bet on ${featured.team2_name}</button>`;
+}
+
+}
+
+card.innerHTML = `
+<button class="how-btn" onclick="showHowToPlay('rapid')">How to play ?</button>
+<div style="${dullStyle} ${disabled}">
+
+<div style="text-align:center;color:#e2e8f0;margin-bottom:10px;">
+${text}
+</div>
+
+<div class="match">
+
+<div class="team">
+<img src="${featured.team1_logo}">
+<div>${featured.team1_name}</div>
+</div>
+
+<div class="vs">VS</div>
+
+<div class="team">
+<img src="${featured.team2_logo}">
+<div>${featured.team2_name}</div>
+</div>
+
+</div>
+
+<div style="text-align:center;margin-top:10px;">
+${button}
+</div>
+
+</div>
+`;
+
+}
+function placeRapid(team){
+
+selectedTeamNumber = team;
+selectedOdds = 10;
+window.isRapid = true;
+
+// show rapid box
+document.getElementById("rapidBetBox").style.display = "block";
+
+document.getElementById("rapidSelectedText").innerText =
+"⚡ Rapid Bet on " + (team==1 ? featured.team1_name : featured.team2_name);
+
+}
+function confirmRapidBet(){
+
+let amt = parseInt(document.getElementById("rapidAmount").value);
+
+if(isNaN(amt) || amt<20 || amt>500){
+showPopup("Enter amount between 20-500");
+return;
+}
+
+secureFetch("/placeBet",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({
+  amount:amt,
+  team:selectedTeamNumber,
+  odds:selectedOdds,
+  match_id:featured.id,
+  type:"rapid"
+})
+})
+.then(async res => {
+
+  if(res.status === 429){
+    showPopup("⚠️ Too many bets! Please wait a few seconds.");
+    return null;
+  }
+
+  return res.json();
+
+})
+.then(data => {
+
+  if(!data) return;
+
+  if(!data.success){
+
+  if(data.msg === "Too fast"){
+    showPopup("⚡ Slow down! You're betting too fast.");
+    return;
+  }
+
+  showPopupWithButton("Insufficient balance");
+  return;
+}
+// ✅ USE POPUP (NOT ALERT)
+showPopup("⚡ Rapid Bet placed!");
+
+// ✅ ADD TO ONGOING BETS INSTANTLY
+addBet(
+  selectedTeamNumber == 1 ? featured.team1_name : featured.team2_name,
+  selectedTeamNumber == 1 ? featured.team1_logo : featured.team2_logo,
+  amt,
+  "pending",
+  0,
+  "rapid"
+);
+
+// reset UI
+document.getElementById("rapidBetBox").style.display="none";
+document.getElementById("rapidAmount").value="";
+
+loadHomeBalance();
+
+});
+}
+function confirmBet(){
+
+let amt = parseInt(document.getElementById("amount").value);
+let currentBalance = parseInt(document.getElementById("homeBalance").innerText);
+if(isNaN(amt) || amt < 20 || amt > currentBalance){
+showPopup("Please enter an amount between 20 - 500");
+return;
+}
+
+secureFetch("/placeBet",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({
+  amount:amt,
+  team:selectedTeamNumber,
+  odds:selectedOdds,
+  match_id:featured.id,
+  type:"normal",
+  player_name: selectedPlayer,
+  bet_category: selectedCategory
+})
+})
+.then(async res => {
+
+  if(res.status === 429){
+    showPopup("⚠️ Too many bets! Please wait a few seconds.");
+    return null;
+  }
+
+  return res.json();
+
+})
+.then(data => {
+
+  if(!data) return;
+
+ if(!data.success){
+
+  if(data.msg === "Too fast"){
+    showPopup("⚡ Slow down! You're betting too fast.");
+    return;
+  }
+
+  showPopupWithButton("Insufficient balance");
+  return;
+}
+
+// success
+showPopup("Bet placed successfully");
+lastBetPlayer = null;
+addBet(selectedTeam,selectedLogo,amt);
+
+document.getElementById("betbox").style.display="none";
+document.getElementById("amount").value="";
+
+window.isRapid = false;
+
+loadHomeBalance();
+
+});
+
+}
+let tossTeam=null;
+
+function tossBet(team){
+
+tossTeam = team;
+
+// show box
+document.getElementById("tossBetBox").style.display="block";
+
+// show team name
+document.getElementById("tossSelectedText").innerText =
+"Betting on " + (team==1 ? featured.team1_name : featured.team2_name);
+
+}
+
+function confirmToss(){
+
+let amt = parseInt(document.getElementById("amt").value);
+
+if(isNaN(amt)||amt<20||amt>500){
+showPopup("Enter 20-500");
+return;
+}
+
+secureFetch("/placeBet",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({
+amount:amt,
+team:tossTeam,
+match_id:featured.id,
+type:"toss"
+})
+})
+.then(res=>res.json())
+.then(data=>{
+if(!data.success){
+showPopup("No balance");
+return;
+}
+
+showPopup("Toss bet placed");
+
+loadHomeBalance();
+});
+}
+function confirmTossBet(){
+
+let amt = parseInt(document.getElementById("tossAmount").value);
+
+if(isNaN(amt) || amt < 20 || amt > 500){
+showPopup("Enter amount between 20-500");
+return;
+}
+secureFetch("/placeBet",{
+method:"POST",
+
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({
+amount:amt,
+team:tossTeam,
+match_id:featured.id,
+type:"toss"
+})
+})
+.then(async res => {
+
+  if(res.status === 429){
+    showPopup("⚠️ Too many bets! Please wait a few seconds.");
+    return null;
+  }
+
+  return res.json();
+
+})
+.then(data => {
+
+  if(!data) return;
+
+  if(!data.success){
+
+  if(data.msg === "Too fast"){
+    showPopup("⚡ Slow down! You're betting too fast.");
+    return;
+  }
+
+  showPopupWithButton("Insufficient balance");
+  return;
+}
+
+showPopup("Toss bet placed 🪙");
+
+// optional: add to ongoing bets
+addBet(
+tossTeam==1 ? featured.team1_name : featured.team2_name,
+tossTeam==1 ? featured.team1_logo : featured.team2_logo,
+amt
+);
+
+// reset UI
+document.getElementById("tossBetBox").style.display="none";
+document.getElementById("tossAmount").value="";
+
+loadHomeBalance();
+
+});
+
+}
+// fake usernames
+const users = [
+"amst****@gmail.com","rahul****@gmail.com","vikas****@gmail.com",
+"john****@gmail.com","rohit****@gmail.com","king****@gmail.com",
+"cool****@gmail.com","alpha****@gmail.com","user****@gmail.com",
+"pro****@gmail.com","fast****@gmail.com","win****@gmail.com"
+];
+
+// fake amounts (max 4000)
+const amounts = [
+120, 250, 480, 999, 1500, 2200, 3050, 3999, 800, 1750, 2600, 3400
+];
+
+function randomItem(arr){
+  return arr[Math.floor(Math.random()*arr.length)];
+}
+
+function startTicker(){
+
+  const text = `${randomItem(users)} has just withdrawn Pts.${randomItem(amounts)}`;
+  const ticker = document.getElementById("tickerText");
+
+  ticker.innerText = text;
+
+  let pos = window.innerWidth;
+
+  function move(){
+    pos -= 2;
+    ticker.style.left = pos + "px";
+
+    if(pos < -ticker.offsetWidth){
+      clearInterval(anim);
+
+      // random delay (1s to 5s)
+      setTimeout(startTicker, Math.random()*4000 + 1000);
+    }
+  }
+
+  const anim = setInterval(move, 16);
+}
+
+// start first time
+startTicker();
+function loadPlayerBets(){
+
+fetch("/playerBets")
+.then(res=>res.json())
+.then(data=>{
+
+  let scorer = document.getElementById("scorerList");
+  let wicket = document.getElementById("wicketList");
+
+  scorer.innerHTML="";
+  wicket.innerHTML="";
+
+  data.forEach(p=>{
+
+    let html = createPlayerRow(p);
+
+    if(p.bet_type === "top_scorer"){
+      scorer.innerHTML += html;
+    }else{
+      wicket.innerHTML += html;
+    }
+
+  });
+
+});
+}
+function createPlayerRow(p){
+
+let teamId = p.team_id;
+
+// 🔥 HARD FIX (THIS IS YOUR MAIN BUG)
+if(teamId !== featured.team1_id && teamId !== featured.team2_id){
+  teamId = (p.team_name === featured.team1_name) ? 1 : 2;
+}
+
+// 🔥 fallback fix (VERY IMPORTANT)
+if(!teamId){
+  teamId = (p.player_name.includes(featured.team1_name)) 
+    ? featured.team1_id 
+    : featured.team2_id;
+}
+
+let logo = (teamId == featured.team1_id)
+  ? featured.team1_logo
+  : featured.team2_logo;
+
+return `
+<div class="player-row">
+
+  <div class="player-left">
+    <img src="${logo}">
+    <div>
+      <div>${p.player_name}</div>
+      <div style="font-size:13px;color:#666;">Odds: ${p.odds}</div>
+    </div>
+  </div>
+
+  <button onclick="togglePlayerBox('${p.player_name}', ${teamId}, ${p.odds}, '${p.bet_type}', ${p.id})">
+    Bet
+  </button>
+
+</div>
+
+<div id="playerBox_${p.id}" style="display:none; text-align:center; margin-bottom:10px;">
+  <input type="number" id="amt_${p.id}" placeholder="20 - balance">
+  <br><br>
+  <button onclick="confirmPlayerBet(${p.id})">Confirm</button>
+</div>
+`;
+}
+let selectedPlayer = null;
+let selectedCategory = null;
+
+
+let currentPlayer = {};
+
+function togglePlayerBox(player, team, odds, type, id){
+
+  let teamNum = (team == featured.team1_id) ? 1 : 2;
+
+currentPlayer = { player, team: teamNum, odds, type, id };
+
+  let box = document.getElementById("playerBox_"+id);
+  box.style.display = (box.style.display === "block") ? "none" : "block";
+}
+function confirmPlayerBet(id){
+
+let amt = parseInt(document.getElementById("amt_"+id).value);
+let balance = parseInt(document.getElementById("homeBalance").innerText);
+
+if(isNaN(amt) || amt < 20 || amt > balance){
+  showPopup("Enter valid amount");
+  return;
+}
+
+secureFetch("/placeBet",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({
+  amount:amt,
+  team: (currentPlayer.team == featured.team1_id ? 1 : 2),
+  odds:currentPlayer.odds,
+  match_id:featured.id,
+  type:"normal",
+  player_name: currentPlayer.player,
+  bet_category: currentPlayer.type
+})
+})
+.then(res=>res.json())
+.then(data=>{
+
+  if(!data.success){
+
+  if(data.msg === "Too fast"){
+    showPopup("⚡ Slow down! You're betting too fast.");
+    return;
+  }
+
+  showPopupWithButton("Insufficient balance");
+  return;
+}
+
+  // ✅ CUSTOM POPUP MESSAGE
+  showPopup(`🎯 Bet placed on ${currentPlayer.player}`);
+
+  // ✅ ADD TO ONGOING BETS INSTANTLY
+  let teamName, teamLogo;
+
+// 🔥 FIX: handle both cases (1/2 OR actual team_id)
+if(currentPlayer.team == 1 || currentPlayer.team == featured.team1_id){
+  teamName = featured.team1_name;
+  teamLogo = featured.team1_logo;
+}else{
+  teamName = featured.team2_name;
+  teamLogo = featured.team2_logo;
+}
+
+addBet(
+  teamName,
+  teamLogo,
+  amt,
+  "pending",
+  0,
+  "player",
+  currentPlayer.player
+);
+
+  // close box
+  document.getElementById("playerBox_"+id).style.display="none";
+
+  // clear input
+  document.getElementById("amt_"+id).value="";
+
+  loadHomeBalance();
+
+});
+}
+loadPlayerBets();
+function goToSession(){
+  window.location.href = "session.html";
+}
+function showHowToPlay(type){
+
+let text = "";
+
+if(type === "toss"){
+  text = `Users can place their points on any team before the toss for each match. If the selected team wins the toss, the user will receive 1.4× returns (for example, 100 points will return 140 points).
+
+Important:
+The toss game will close immediately once the toss is completed.`;
+}
+
+else if(type === "match"){
+  text = `Users can place their points on the team they believe will win the match. If the selected team wins, the user will earn returns based on the rate displayed below each team.
+
+Important:
+a) The rates shown below each team are dynamic and may change at any time.
+b) The live match game will close at any point during the first powerplay.`;
+}
+
+else if(type === "rapid"){
+  text = `The Rapid Bet game will open during the last 5 overs of the match. Users can place their points on the team with lower winning chances. If that team wins, the user will receive 10× returns (for example, 100 points will return 1,000 points).`;
+}
+
+else if(type === "scorer"){
+  text = `Users can place their points on any batsman they believe will score the highest runs in the match. If the selected batsman becomes the top scorer, the user will receive returns based on the rate displayed below each player’s name.
+
+Important:
+a) The rates shown are dynamic and may change at any time.
+b) This game will close at any point during the first powerplay.`;
+}
+
+else if(type === "wicket"){
+  text = `Users can place their points on any bowler they believe will take the highest wickets in the match. If the selected bowler becomes the top wicket taker, the user will receive returns based on the rate displayed below each player’s name.
+
+Important:
+a) The rates shown are dynamic and may change at any time.
+b) This game will close at any point during the first powerplay.`;
+}
+
+// ✅ use your existing popup
+showPopup(text);
+
+}
+</script>
+<footer style="background:#000000; color:#fffcfc; padding:15px; text-align:center; font-size:12px; border-top:1px solid #ddd;">
+All transactions conducted on this website are carried out exclusively using virtual currency. No real-world currency is utilized, involved, or affected in any manner. The platform does not intend to represent, misuse, or disrespect any form of legal tender whatsoever.
+</footer>
+</body>
+</html>

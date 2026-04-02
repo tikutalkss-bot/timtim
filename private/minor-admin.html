@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Minor Admin Panel</title>
+<link rel="stylesheet" href="style.css">
+<style>
+/* RESET */
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+
+}
+
+/* BACKGROUND */
+body{
+background:linear-gradient(135deg,#eef2f7,#e6ecf5);
+margin:0;
+padding:20px;
+color:#222;
+}
+
+/* TITLE */
+h2{
+text-align:center;
+margin-bottom:10px;
+color:#0f172a;
+}
+
+/* LOGOUT BUTTON */
+button{
+background:#0f172a;
+color:#00ffc3;
+border:none;
+padding:10px 18px;
+border-radius:8px;
+cursor:pointer;
+font-weight:600;
+transition:0.3s;
+box-shadow:0 0 10px rgba(0,255,200,0.2);
+}
+
+button:hover{
+background:#020617;
+box-shadow:0 0 18px rgba(0,255,200,0.6);
+transform:translateY(-2px);
+}
+
+/* TOP BOX (EARNINGS) */
+.top-box{
+background:linear-gradient(135deg,#0f172a,#020617);
+color:#00ffc3;
+padding:20px;
+border-radius:16px;
+text-align:center;
+margin-bottom:25px;
+font-size:18px;
+font-weight:600;
+box-shadow:0 0 20px rgba(0,255,200,0.2);
+position:relative;
+overflow:hidden;
+}
+
+/* glow animation */
+.top-box::after{
+content:'';
+position:absolute;
+top:0;
+left:-100%;
+width:100%;
+height:100%;
+background:linear-gradient(120deg,transparent,rgba(0,255,200,0.3),transparent);
+animation:shine 3s infinite;
+}
+
+@keyframes shine{
+0%{left:-100%;}
+100%{left:100%;}
+}
+
+/* SECTIONS */
+.section{
+margin-top:20px;
+}
+
+.section h3{
+margin-bottom:10px;
+color:#333;
+}
+
+/* CARD */
+.card{
+background:white;
+padding:15px;
+margin-bottom:12px;
+border-radius:14px;
+box-shadow:0 10px 25px rgba(0,0,0,0.08);
+transition:0.3s;
+position:relative;
+overflow:hidden;
+}
+
+/* neon border */
+.card::before{
+content:'';
+position:absolute;
+inset:0;
+border-radius:14px;
+padding:1px;
+background:linear-gradient(120deg,#00ffc3,transparent,#00ffc3);
+-webkit-mask:
+linear-gradient(#fff 0 0) content-box,
+linear-gradient(#fff 0 0);
+-webkit-mask-composite:xor;
+mask-composite:exclude;
+opacity:0;
+transition:0.4s;
+}
+
+.card:hover::before{
+opacity:1;
+}
+
+.card:hover{
+transform:translateY(-4px);
+}
+
+/* MATCH SECTION INSIDE CARD */
+.card img{
+border-radius:8px;
+transition:0.3s;
+}
+
+.card img:hover{
+transform:scale(1.1);
+}
+
+/* COLORS */
+.red{
+color:#ff4d4f;
+font-weight:600;
+text-shadow:0 0 5px rgba(255,0,0,0.3);
+}
+
+.green{
+color:#00b894;
+font-weight:600;
+text-shadow:0 0 5px rgba(0,255,150,0.3);
+}
+
+/* TEXT */
+.card b{
+color:#0f172a;
+}
+
+/* MOBILE */
+@media(max-width:600px){
+body{
+padding:15px;
+}
+}
+</style>
+
+</head>
+
+<body>
+<button onclick="logout()" style="margin-bottom:15px;">Logout</button>
+<h2>Minor Admin Panel</h2>
+ 
+<div class="top-box">
+Total Earnings: ₹ <span id="earnings">0</span>
+</div>
+
+<!-- MATCHES -->
+<div class="section">
+<h3>Matches</h3>
+<div id="matches"></div>
+</div>
+
+<!-- USERS -->
+<div class="section">
+<h3>Your Users</h3>
+<div id="users"></div>
+</div>
+
+<script>
+let CSRF_TOKEN = null;
+
+// fetch token once
+async function loadCSRF(){
+  try{
+    const res = await fetch("/csrf-token", {
+      credentials: "include"
+    });
+    const data = await res.json();
+    CSRF_TOKEN = data.csrfToken;
+  }catch(e){
+    console.error("CSRF load error");
+  }
+}
+
+// wrapper for ALL POST requests
+async function secureFetch(url, options = {}){
+  if(!CSRF_TOKEN){
+    await loadCSRF();
+  }
+
+  options.headers = {
+    ...(options.headers || {}),
+    "Content-Type": "application/json",
+    "CSRF-Token": CSRF_TOKEN
+  };
+
+  options.credentials = "include";
+
+  return fetch(url, options);
+}
+
+// load token on page start
+loadCSRF();
+//////////////////////
+// LOAD MATCHES
+//////////////////////
+
+function loadMatches(){
+
+fetch("/matches")
+.then(res=>res.json())
+.then(data=>{
+
+let featured = data.find(m => m.status === "featured");
+
+if(!featured){
+  document.getElementById("matches").innerHTML = "No match";
+  return;
+}
+
+let box = document.getElementById("matches");
+box.innerHTML = "";
+
+let card = document.createElement("div");
+card.className = "card";
+
+// date
+let date = document.createElement("div");
+date.style.textAlign = "center";
+date.style.color = "#555";
+date.style.marginBottom = "10px";
+date.textContent = "🔴 LIVE • " + formatMatchDate(featured.match_date);
+
+// teams container
+let row = document.createElement("div");
+row.style.display = "flex";
+row.style.justifyContent = "space-between";
+row.style.alignItems = "center";
+
+// team 1
+let t1 = document.createElement("div");
+t1.style.textAlign = "center";
+t1.style.width = "40%";
+
+let img1 = document.createElement("img");
+img1.src = featured.team1_logo;
+img1.style.width = "60px";
+
+let name1 = document.createElement("div");
+name1.textContent = featured.team1_name;
+
+t1.appendChild(img1);
+t1.appendChild(name1);
+
+// VS
+let vs = document.createElement("div");
+vs.textContent = "VS";
+vs.style.fontWeight = "bold";
+
+// team 2
+let t2 = document.createElement("div");
+t2.style.textAlign = "center";
+t2.style.width = "40%";
+
+let img2 = document.createElement("img");
+img2.src = featured.team2_logo;
+img2.style.width = "60px";
+
+let name2 = document.createElement("div");
+name2.textContent = featured.team2_name;
+
+t2.appendChild(img2);
+t2.appendChild(name2);
+
+// assemble
+row.appendChild(t1);
+row.appendChild(vs);
+row.appendChild(t2);
+
+card.appendChild(date);
+card.appendChild(row);
+
+box.appendChild(card);
+
+});
+
+}
+
+//////////////////////
+// LOAD USERS + EARNINGS
+//////////////////////
+
+function loadUsers(){
+
+fetch("/minorAdminData")
+.then(res=>{
+  if(!res.ok){
+    window.location.href = "admin-login.html";
+    return null;
+  }
+  return res.json();
+})
+.then(data=>{
+  if(!data) return;
+
+if(data.error){
+alert("Not logged in");
+return;
+}
+
+let box = document.getElementById("users");
+box.innerHTML = "";
+
+data.users.forEach(u=>{
+
+let card = document.createElement("div");
+card.className = "card";
+
+// name
+let name = document.createElement("b");
+name.textContent = u.name;
+
+// email
+let email = document.createElement("span");
+email.textContent = " (" + u.email + ")";
+
+// balance
+let balance = document.createElement("div");
+balance.textContent = "Balance: ₹" + u.balance;
+
+// loss
+let loss = document.createElement("div");
+loss.innerHTML = `Loss: <span class="red">₹${u.loss}</span>`; // safe enough
+
+// assemble
+card.appendChild(name);
+card.appendChild(email);
+card.appendChild(document.createElement("br"));
+card.appendChild(balance);
+card.appendChild(loss);
+
+box.appendChild(card);
+
+});
+document.getElementById("earnings").innerText = data.earnings;
+
+});
+
+}
+
+//////////////////////
+// INIT
+//////////////////////
+function logout(){
+secureFetch("/adminLogout", {
+  method: "POST"
+})
+.then(()=>{
+  window.location.href = "admin-login.html";
+});
+}
+function formatMatchDate(dateStr){
+
+if(!dateStr) return "Date not set";
+
+let d = new Date(dateStr);
+
+// day with suffix
+let day = d.getDate();
+let suffix = ["th","st","nd","rd"][(day%10>3)?0:(day%100-day%10!=10)?day%10:0];
+
+// month
+let month = d.toLocaleString('default',{month:'long'});
+
+// year
+let year = d.getFullYear();
+
+// time (12hr)
+let hours = d.getHours();
+let ampm = hours >= 12 ? "pm" : "am";
+hours = hours % 12 || 12;
+
+return `${day}${suffix} ${month} ${year} at ${hours}${ampm}`;
+
+}
+loadMatches();
+loadUsers();
+
+// optional auto refresh
+setInterval(loadUsers, 8000);
+
+</script>
+
+</body>
+</html>
