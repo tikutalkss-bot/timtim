@@ -962,9 +962,7 @@ try{
 }catch(err){
 
   await client.query("ROLLBACK");
-  if(process.env.NODE_ENV !== "production"){
-  console.error(err);
-}
+  console.log("INSERT ERROR:", err.message); // ← ADD THIS LINE
   return res.json({success:false});
 
 }finally{
