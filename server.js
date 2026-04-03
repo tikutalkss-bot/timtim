@@ -37,7 +37,7 @@ app.use(session({
   saveUninitialized: false,
   cookie: {
     httpOnly: true,
-    secure: false,
+    secure: true,
     sameSite: "lax"
   }
 }));
@@ -139,9 +139,9 @@ const csrfProtection = csurf({
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: {
-    rejectUnauthorized: false
-  }
+  ssl: process.env.NODE_ENV === "production"
+    ? { rejectUnauthorized: false }
+    : false
 });
 // ✅ SESSION QUESTIONS CONFIG
 const sessionQuestions = [
