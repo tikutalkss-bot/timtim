@@ -909,6 +909,18 @@ try{
 
   await client.query("BEGIN");
 
+  // DEBUG - check actual balance
+  const balanceCheck = await client.query(
+    "SELECT balance FROM users WHERE id=$1",
+    [req.session.userId]
+  );
+  console.log("DB BALANCE:", balanceCheck.rows[0]?.balance);
+  console.log("TRYING TO DEDUCT:", amount);
+  console.log("MATCH ID:", match_id);
+  console.log("TEAM:", team);
+  console.log("TYPE:", type);
+  console.log("ODDS:", odds);
+
   // 1. deduct balance safely
   const result = await client.query(
     `UPDATE users 
@@ -920,6 +932,7 @@ try{
 
   if(result.rowCount === 0){
     await client.query("ROLLBACK");
+    console.log("ROLLBACK HAPPENED - balance too low or user not found");
     return res.json({success:false});
   }
 
