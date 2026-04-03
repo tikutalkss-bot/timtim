@@ -1170,12 +1170,14 @@ await pool.query(
 
     res.json({ success: true });
 
-  } catch(err){
-    if(process.env.NODE_ENV !== "production"){
-  console.error(err);
+ } catch(err){
+  console.error("SIGNUP ERROR:", err); // keep this ALWAYS
+
+  res.status(500).json({
+    success: false,
+    message: "Signup error"
+  });
 }
-    res.send("Signup error");
-  }
 });
 app.get("/walletHistory", isLoggedIn, async (req,res)=>{
 
