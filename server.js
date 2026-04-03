@@ -476,48 +476,62 @@ app.post("/setPlayerBets", csrfProtection, isMainAdmin, async (req,res)=>{
 });
 /* PAYMENT */
 app.post("/requestPayment", csrfProtection, loginLimiter, async (req,res)=>{
+  try{
 
-  const name = cleanInput(req.body.name);
-const amount = req.body.amount;
-const transaction_id = cleanInput(req.body.transaction_id);
-if(!isValidNumber(amount, 20, 1000)){
-  return res.json({success:false});
-}
-  if(!req.session.userId){
-    return res.json({ success:false });
+    const name = cleanInput(req.body.name);
+    const amount = req.body.amount;
+    const transaction_id = cleanInput(req.body.transaction_id);
+
+    if(!isValidNumber(amount, 20, 1000)){
+      return res.json({success:false, message:"Invalid amount"});
+    }
+
+    if(!req.session.userId){
+      return res.json({ success:false, message:"Not logged in" });
+    }
+
+    const amountNum = Number(amount);
+
+    if(!name || !amount || !transaction_id){
+      return res.json({ success:false, message:"All fields required" });
+    }
+
+    if(amountNum < 20 || amountNum > 1000){
+      return res.json({
+        success:false,
+        message:"Amount must be between 20-1000"
+      });
+    }
+
+    const userData = await pool.query(
+      "SELECT email FROM users WHERE id=$1",
+      [req.session.userId]
+    );
+
+    if(userData.rows.length === 0){
+      return res.json({ success:false, message:"User not found" });
+    }
+
+    const email = userData.rows[0].email;
+
+    await pool.query(`
+      INSERT INTO payment_requests (name,email,amount,transaction_id,status)
+      VALUES ($1,$2,$3,$4,'pending')
+    `,[name,email,amountNum,transaction_id]);
+
+    return res.json({
+      success:true,
+      message:"Payment request submitted"
+    });
+
+  }catch(err){
+    console.error("PAYMENT ERROR:", err);
+
+    return res.status(500).json({
+      success:false,
+      message:"Server error"
+    });
   }
-
-  const amountNum = Number(amount);
-
-  if(!name || !amount || !transaction_id){
-    return res.json({ success:false, message:"All fields required" });
-  }
-
-  if(isNaN(amountNum) || amountNum <= 0){
-    return res.json({ success:false, message:"Invalid amount" });
-  }
-
-  if(amountNum < 20 || amountNum > 1000){
-    return res.send("Amount must be between 20-1000");
-  }
-
-  const userData = await pool.query(
-    "SELECT email FROM users WHERE id=$1",
-    [req.session.userId]
-  );
-
-  if(userData.rows.length === 0){
-    return res.json({ success:false });
-  }
-
-  const email = userData.rows[0].email;
-
-  await pool.query(`
-    INSERT INTO payment_requests (name,email,amount,transaction_id,status)
-    VALUES ($1,$2,$3,$4,'pending')
-  `,[name,email,amountNum,transaction_id]);
-
-  res.json({ success:true, message:"Payment request submitted" });
 });
 
 /* WITHDRAW */

@@ -496,7 +496,7 @@ headers:{"Content-Type":"application/json"},
 body:JSON.stringify({name:n,email:e,amount:amt,transaction_id:ex})
 })
 .then(res=>res.json())
-.then(data=>showPopup(data.message));
+.then(data=>showPopup(data.message || "Something went wrong"));
 
 }
 
