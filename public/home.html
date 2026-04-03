@@ -1216,9 +1216,7 @@ body:JSON.stringify({
   team:selectedTeamNumber,
   odds:selectedOdds,
   match_id:featured.id,
-  type:"normal",
-  player_name: selectedPlayer,
-  bet_category: selectedCategory
+  type:"normal"
 })
 })
 .then(async res => {
@@ -1242,7 +1240,7 @@ body:JSON.stringify({
     return;
   }
 
-  showPopupWithButton("Insufficient balance");
+  showPopupWithButton(data.msg || "Bet failed");
   return;
 }
 
