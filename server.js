@@ -745,9 +745,9 @@ app.post("/placeBet", csrfProtection, strictLimiter, isLoggedIn, async (req,res)
     console.log("AMOUNT:", amount);
 console.log("TYPE:", typeof amount);
 console.log("USER ID:", req.session.userId);
-let team = req.body.team;
 
-let match_id = req.body.match_id;
+let match_id = Number(req.body.match_id);
+let team = Number(req.body.team);
 let type = req.body.type;
 let player_name = cleanInput(req.body.player_name);
 let bet_category = cleanInput(req.body.bet_category);
