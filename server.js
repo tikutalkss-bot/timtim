@@ -1669,7 +1669,9 @@ const existing = await pool.query(
 );
 
 if(existing.rows.length > 0){
-  if(Date.now() < existing.rows[0].expires_at - (4 * 60 * 1000)){
+  const expiresAt = new Date(existing.rows[0].expires_at).getTime();
+
+  if(Date.now() < expiresAt - (4 * 60 * 1000)){
     return res.json({success:true});
   }
 }
@@ -1687,12 +1689,20 @@ await pool.query(`
   DO UPDATE SET otp=$2, expires_at=$3, attempts=0
 `, [email, hashedOtp, expires]);
 
-await transporter.sendMail({
-  from: "tikutalkss@gmail.com",
-  to: email,
-  subject: "OTP Verification",
-  text: `Your OTP is ${rawOtp}`
-});
+try {
+  await transporter.sendMail({
+    from: process.env.EMAIL_USER,   // ✅ FIX HERE
+    to: email,
+    subject: "OTP Verification",
+    text: `Your OTP is ${rawOtp}`
+  });
+} catch (err) {
+  console.error("MAIL ERROR:", err);
+  return res.status(500).json({
+    success: false,
+    message: "Email failed"
+  });
+}
 
 res.json({success:true});
 
