@@ -1202,10 +1202,9 @@ loadHomeBalance();
 function confirmBet(){
 
 let amt = parseInt(document.getElementById("amount").value);
-let currentBalance = parseInt(document.getElementById("homeBalance").innerText);
-if(isNaN(amt) || amt < 20 || amt > currentBalance){
-showPopup("Please enter an amount between 20 - 500");
-return;
+if(isNaN(amt) || amt < 20 || amt > 500){
+  showPopup("Enter amount between 20 - 500");
+  return;
 }
 
 secureFetch("/placeBet",{
@@ -1274,37 +1273,7 @@ document.getElementById("tossSelectedText").innerText =
 
 }
 
-function confirmToss(){
 
-let amt = parseInt(document.getElementById("amt").value);
-
-if(isNaN(amt)||amt<20||amt>500){
-showPopup("Enter 20-500");
-return;
-}
-
-secureFetch("/placeBet",{
-method:"POST",
-headers:{"Content-Type":"application/json"},
-body:JSON.stringify({
-amount:amt,
-team:tossTeam,
-match_id:featured.id,
-type:"toss"
-})
-})
-.then(res=>res.json())
-.then(data=>{
-if(!data.success){
-showPopup("No balance");
-return;
-}
-
-showPopup("Toss bet placed");
-
-loadHomeBalance();
-});
-}
 function confirmTossBet(){
 
 let amt = parseInt(document.getElementById("tossAmount").value);

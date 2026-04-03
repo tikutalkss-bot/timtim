@@ -908,10 +908,7 @@ const client = await pool.connect();
 try{
 
   await client.query("BEGIN");
-await client.query(
-  "SELECT balance FROM users WHERE id=$1 FOR UPDATE",
-  [req.session.userId]
-);
+
   // 1. deduct balance safely
   const result = await client.query(
     `UPDATE users 
