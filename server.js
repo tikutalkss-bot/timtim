@@ -741,7 +741,10 @@ app.get("/balance", isLoggedIn, async (req,res)=>{
 app.post("/placeBet", csrfProtection, strictLimiter, isLoggedIn, async (req,res)=>{
   try {
 
-    let amount = req.body.amount;
+    let amount = Number(req.body.amount);
+    console.log("AMOUNT:", amount);
+console.log("TYPE:", typeof amount);
+console.log("USER ID:", req.session.userId);
 let team = req.body.team;
 
 let match_id = req.body.match_id;
